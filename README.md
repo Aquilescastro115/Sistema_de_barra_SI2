@@ -5,5 +5,7 @@ docker-compose up --build
 
 Para que hagan las pruebas.
 
+Cuando haya cambios solamente y no sea la primera vez usandolo solo:
 
+docker-compose up
 

@@ -31,7 +31,7 @@ function HomePage({ count }) {
                 </button>
             </div>
             <div className='card'>
-                <p>Edit <code>src/App.jsx</code> SI ESTO SE VE FUNCIONA EL HOTRELOAD</p>
+                <p>Edit <code>src/App.jsx</code> SI ESTO SE VE aL HOTRELOAD</p>
             </div>
 
 

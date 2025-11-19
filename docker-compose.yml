@@ -3,51 +3,53 @@ version: '3.8'
 services:
   # 1. BASE DE DATOS (MySQL)
   db:
-    image: mysql:8.0 # Usamos una imagen estable y popular
+    image: mysql:8.0
     container_name: mysql_sistema_db
     restart: always
     environment:
-      # VARIABLES CRUCIALES DE LA BASE DE DATOS
-      MYSQL_ROOT_PASSWORD: secure_root_password_999 # ¡Cámbiala por una más segura!
+      MYSQL_ROOT_PASSWORD: secure_root_password_999
       MYSQL_DATABASE: sistema_db
       MYSQL_USER: user_app
-      MYSQL_PASSWORD: app_user_password_999 # ¡Cámbiala por una más segura!
+      MYSQL_PASSWORD: app_user_password_999
     ports:
-      - "3307:3306" # Permite acceder a MySQL desde tu máquina host (opcional para desarrollo)
+      - "3307:3306"
     volumes:
-      - db_data:/var/lib/mysql # **PERSISTENCIA:** Guarda los datos de MySQL en un volumen de Docker
+      - db_data:/var/lib/mysql
 
   # 2. BACKEND (Flask/Python)
   backend:
     build:
-      context: ./backend      # Busca el Dockerfile en la carpeta 'backend'
+      context: ./backend
     container_name: flask_sistema_backend
     ports:
-      - "5000:5000"           # Acceso a la API en http://localhost:5000
+      - "5000:5000"
     environment:
-      # VARIABLES QUE TU CÓDIGO FLASK LEE PARA CONECTARSE A 'db'
-      DATABASE_HOST: db       # CRUCIAL: 'db' es el nombre del servicio MySQL
+      DATABASE_HOST: db
       DATABASE_USER: user_app
       DATABASE_PASSWORD: app_user_password_999
       DATABASE_NAME: sistema_db
     depends_on:
-      - db                    # Asegura que MySQL inicie antes que Flask
+      - db
     volumes:
-      - ./backend:/app        # Mapea tu código local al contenedor para desarrollo (cambios en tiempo real)
+      - ./backend:/app
 
-  # 3. FRONTEND (React)
+  # 3. FRONTEND (React) -- Configurado para Hot Reload
   frontend:
     build:
-      context: ./frontend     # Busca el Dockerfile en la carpeta 'frontend'
+      context: ./frontend
+      dockerfile: Dockerfile  # Usamos el Dockerfile para desarrollo
     container_name: react_sistema_frontend
     ports:
-      - "3000:80"           # Acceso al Front-end en http://localhost:3000
-    stdin_open: true          # Necesario para el servidor de desarrollo de React
+      - "3000:3000"  # Puerto para Hot Reload (desarrollo)
+    environment:
+      - HOST=0.0.0.0
+      - CHOKIDAR_USEPOLLING=true  # Para mejorar la detección de cambios
+    stdin_open: true
     depends_on:
-      - backend               # Opcional, pero asegura que el backend esté listo para las llamadas API
+      - backend
     volumes:
       - ./frontend:/app
-      - /app/node_modules     # Evita que Docker pise tu node_modules local
+      - /app/node_modules
 
 # Definición del Volumen de Datos para MySQL
 volumes:

@@ -13,6 +13,8 @@ RUN npm ci
 # Copiar el resto del proyecto
 COPY . .
 
+RUN npm install
+
 # Construir el proyecto (Vite generará /dist)
 RUN npm run build
 

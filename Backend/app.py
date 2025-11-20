@@ -56,9 +56,3 @@ if __name__ == '__main__':
     # Esto imprime las rutas al iniciar
     print(app.url_map)
     app.run(host='0.0.0.0', port=5000, debug=True)
-=======
-    # Esto es solo para uso local fuera de Docker/Gunicorn
-    app.run(host='0.0.0.0', port=5000, debug=True)
-
-    
->>>>>>> 8f267e670258bb3cc4a1a1daf4afd15c6bb2f727

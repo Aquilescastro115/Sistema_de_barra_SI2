@@ -3,3 +3,5 @@ PyMySQL # Para conectarse a MySQL
 python-dotenv # Útil para cargar variables de entorno (aunque Docker Compose ya las provee)
 Flask-CORS # Para permitir peticiones del frontend (React)
 gunicorn # Servidor web de producción (mejor que el de desarrollo de Flask)
+flask_sqlalchemy
+cryptography

@@ -1,3 +1,4 @@
+USE sistema_db;
 -- Desactivar chequeos temporalmente para evitar errores al crear
 SET @OLD_UNIQUE_CHECKS=@@UNIQUE_CHECKS, UNIQUE_CHECKS=0;
 SET @OLD_FOREIGN_KEY_CHECKS=@@FOREIGN_KEY_CHECKS, FOREIGN_KEY_CHECKS=0;
@@ -86,11 +87,11 @@ CREATE TABLE IF NOT EXISTS `sistema_db`.`Detalle_prestamo` (
 ENGINE = InnoDB;
 
 -- Insertar un Equipo de prueba para que la API tenga algo que mostrar
-INSERT INTO Equipo (Codigo_qr, Tipo_equipo, Descripcion, Estado) 
+/*INSERT INTO Equipo (Codigo_qr, Tipo_equipo, Descripcion, Estado) 
 VALUES (1010, 'Notebook', 'Lenovo Thinkpad T480', 'Disponible');
 
 INSERT INTO Equipo (Codigo_qr, Tipo_equipo, Descripcion, Estado) 
-VALUES (2020, 'Proyector', 'Epson HDMI', 'Prestado');
+VALUES (2020, 'Proyector', 'Epson HDMI', 'Prestado');*/
 
 SET SQL_MODE=@OLD_SQL_MODE;
 SET FOREIGN_KEY_CHECKS=@OLD_FOREIGN_KEY_CHECKS;

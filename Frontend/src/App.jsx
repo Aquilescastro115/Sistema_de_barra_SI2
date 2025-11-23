@@ -17,6 +17,18 @@ function HomePage({ scannedData, removeScannedItem, updateScannedItem }) {
 
     return (
         <div className="container">
+            <div className="button-container">
+                <div className="card">
+                    <h3>Escanea tu Credencial</h3>
+                    <button onClick={handleNavigation}>
+                        Ir a escáner de códigos de barras
+                    </button> <br></br>
+                    <button onClick={handleNavigationQR}>
+                        Ir a escáner de códigos QR        
+                        </button>
+                </div>
+            </div>
+
             <div className="data-container">
                 <h3>Datos escaneados:</h3>
                 <ul>
@@ -41,18 +53,6 @@ function HomePage({ scannedData, removeScannedItem, updateScannedItem }) {
                         )) 
                     : <li>No se han escaneado datos.</li>}
                 </ul>
-            </div>
-
-            <div className="button-container">
-                <div className="card">
-                    <button onClick={handleNavigation}>
-                        Ir a escáner de barra 
-                    </button>
-                    <br />
-                    <button onClick={handleNavigationQR}>
-                        Ir a escáner de QR
-                    </button>
-                </div>
             </div>
         </div>
     );

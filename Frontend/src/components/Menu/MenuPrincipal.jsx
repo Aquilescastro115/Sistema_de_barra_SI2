@@ -1,8 +1,8 @@
 import { useState } from 'react';
 import './App.css';
 import { Routes, Route, useNavigate } from 'react-router-dom';
-import ScannerPage from './components/ScannerBar/ScannerPage.jsx';
-import ScannerQR from './components/ScannerQR/ScannerQR.jsx';
+import ScannerPage from '../ScannerBar/ScannerPage.jsx';
+import ScannerQR from '../ScannerQR/ScannerQR.jsx';
 
 function HomePage({ scannedData, removeScannedItem, updateScannedItem }) {
     const navigate = useNavigate();
@@ -17,8 +17,20 @@ function HomePage({ scannedData, removeScannedItem, updateScannedItem }) {
 
     return (
         <div className="container">
+            <div className="button-container">
+                <div className="card">
+                    <h3>Escanea tu Credencial</h3>
+                    <button onClick={handleNavigation}>
+                        Ir a escáner de códigos de barras
+                    </button> <br></br>
+                    <button onClick={handleNavigationQR}>
+                        Ir a escáner de códigos QR        
+                        </button>
+                </div>
+            </div>
+
             <div className="data-container">
-                <h3>En esta parte pon el login chilino</h3>
+                <h3>Datos escaneados:</h3>
                 <ul>
                     {scannedData.length > 0 ? 
                         scannedData.map((data, index) => (
@@ -42,23 +54,11 @@ function HomePage({ scannedData, removeScannedItem, updateScannedItem }) {
                     : <li>No se han escaneado datos.</li>}
                 </ul>
             </div>
-
-            <div className="button-container">
-                <div className="card">
-                    <button onClick={handleNavigation}>
-                        Ir a escáner de barra 
-                    </button>
-                    <br />
-                    <button onClick={handleNavigationQR}>
-                        Ir a escáner de QR
-                    </button>
-                </div>
-            </div>
         </div>
     );
 }
 
-function App() {
+function MenuPrincipal() {
     const [scannedData, setScannedData] = useState([]);
 
     const addScannedItem = (item) => {
@@ -109,4 +109,4 @@ function App() {
     );
 }
 
-export default App;
+export default MenuPrincipal;

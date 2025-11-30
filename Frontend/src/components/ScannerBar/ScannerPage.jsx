@@ -1,64 +1,167 @@
-import React, { useState } from 'react';
+import React, { useRef, useState } from 'react';
 import { useBarcodeScanner } from './useBarcodeScanner.js';
 import { useNavigate } from 'react-router-dom';
 
 function ScannerPage({ addScannedItem }) {
+
   const [scannedCode, setScannedCode] = useState("Esperando...");
-  const [scanMode, setScanMode] = useState('persona');
+  const personaCodeRef = useRef('');
+  const equipoCodeRef = useRef('');
+  const [personaCode, setPersonaCode] = useState('');
+  const [equipoCode, setEquipoCode] = useState('');
+  const [scanStep, setScanStep] = useState('persona');
   const navigate = useNavigate();
 
   useBarcodeScanner({
     onScan: (code) => {
       console.log("Escaneado:", code);
       setScannedCode(code);
-      addScannedItem({ codigo: code, hora: new Date().toLocaleTimeString() });
-      navigate('/');  
-      addScannedItem({ codigo: code, hora: new Date().toLocaleTimeString(), tipo: scanMode });
+
+      if (scanStep === 'persona') {
+        personaCodeRef.current = code;
+        setPersonaCode(code);
+        setScanStep('equipo');
+        return;
+      }
+
+      equipoCodeRef.current = code;
+      setEquipoCode(code);
+      addScannedItem({
+        personaCodigo: personaCodeRef.current,
+        equipoCodigo: code,
+        hora: new Date().toLocaleString(),
+      });
+      resetScan();
       navigate('/');
     }
   });
 
+  const resetScan = () => {
+    personaCodeRef.current = '';
+    equipoCodeRef.current = '';
+    setPersonaCode('');
+    setEquipoCode('');
+    setScannedCode('Esperando...');
+    setScanStep('persona');
+  };
+
   return (
-    <div style={{ textAlign: 'center', padding: '50px' }}>
-      <h1>Página de Escaneo</h1>
+      <div>
+        <style>{`
+          :root {
+            --primary: steelblue;
+            --text-dark: #333;
+            --text-muted: #666;
+            --card-bg: #ffffff;
+            --radius: 12px;
+            --shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+          }
 
-      <div style={{ marginBottom: '20px' }}>
-        <p style={{ fontWeight: 'bold', marginBottom: '10px' }}>¿Qué deseas escanear?</p>
-        <div style={{ display: 'flex', gap: '10px', justifyContent: 'center' }}>
-          <button
-            onClick={() => setScanMode('persona')}
-            style={{
-              padding: '10px 15px',
-              backgroundColor: scanMode === 'persona' ? '#4caf50' : '#e0e0e0',
-              color: scanMode === 'persona' ? 'white' : 'black',
-              border: 'none',
-              cursor: 'pointer'
-            }}
-          >
-            Datos de la persona
-          </button>
-          <button
-            onClick={() => setScanMode('equipo')}
-            style={{
-              padding: '10px 15px',
-              backgroundColor: scanMode === 'equipo' ? '#4caf50' : '#e0e0e0',
-              color: scanMode === 'equipo' ? 'white' : 'black',
-              border: 'none',
-              cursor: 'pointer'
-            }}
-          >
-            Datos del equipo
-          </button>
+          body, html {
+            margin: 0;
+            padding: 0;
+          }
+
+          .scanner-container {
+            max-width: 580px;
+            margin: 60px auto;
+            padding: 40px;
+            text-align: center;
+            background: var(--card-bg);
+            border-radius: var(--radius);
+            box-shadow: var(--shadow);
+          }
+
+          .scanner-container h1 {
+            margin-bottom: 28px;
+            color: var(--primary);
+            font-size: 30px;
+          }
+
+          .info-text {
+            font-weight: bold;
+            margin-bottom: 20px;
+            line-height: 1.5;
+            font-size: 19px;
+          }
+
+          .step-text {
+            margin-top: 10px;
+            margin-bottom: 28px;
+            font-size: 18px;
+            color: var(--text-muted);
+          }
+
+          .scanned-box {
+            margin-bottom: 28px;
+          }
+
+          .scanned-box p {
+            margin: 10px 0;
+            font-size: 18px;
+          }
+
+          .label {
+            font-weight: bold;
+            color: var(--primary);
+          }
+
+          .scan-reset-btn {
+            background: var(--primary);
+            color: white;
+            border: none;
+            padding: 12px 22px;
+            cursor: pointer;
+            font-size: 16px;
+            border-radius: var(--radius);
+            transition: 0.2s;
+            margin-bottom: 20px;
+          }
+
+          .scan-reset-btn:hover {
+            background: #3b6f99;
+          }
+
+          .detected {
+            font-size: 22px;
+            font-weight: bold;
+            margin-top: 15px;
+            margin-bottom: 5px;
+            color: var(--text-dark);
+          }
+
+          .helper-text {
+            font-size: 13px;
+            color: var(--text-muted);
+          }
+      `}</style>
+
+
+      <div className="scanner-container">
+        <h1>Página de Escaneo</h1>
+
+        <div>
+          <p className="info-text">Escanea primero el código del profesor <br></br> y luego el equipo.</p>
+          <p className="step-text">Paso actual: <strong>{scanStep === 'persona' ? 'Persona' : 'Equipo'}</strong></p>
         </div>
-        <p style={{ marginTop: '10px', color: 'gray' }}>Modo seleccionado: <strong>{scanMode === 'persona' ? 'Persona' : 'Equipo'}</strong></p>
-      </div>
 
-      <p style={{ fontSize: '24px', fontWeight: 'bold', color: 'gray' }}>
-        Producto detectado: {scannedCode}
-      </p> <br></br>
-      <p style={{ fontSize: '12px', color: 'gray' }}>
-        (Usa la pistola USB o escribe rápido y presiona Enter)
-      </p>
+        <div className="scanned-box">
+          <p><span className="label">Profesor:</span> {personaCode || 'Pendiente'}</p>
+          <p><span className="label">Equipo:</span> {equipoCode || 'Pendiente'}</p>
+        </div>
+
+        <button className="scan-reset-btn" onClick={resetScan}>
+          Reiniciar escaneo
+        </button>
+
+        <p className="detected">
+          Producto detectado: {scannedCode}
+        </p> <br></br>
+
+        <p className="helper-text">
+          (Usa la pistola USB o escribe rápido y presiona Enter)
+        </p>
+      </div>
     </div>
   );
 }

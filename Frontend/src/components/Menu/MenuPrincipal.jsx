@@ -1,111 +1,82 @@
-import { useState } from 'react';
-import './App.css';
-import { Routes, Route, useNavigate } from 'react-router-dom';
-import ScannerPage from '../ScannerBar/ScannerPage.jsx';
-import ScannerQR from '../ScannerQR/ScannerQR.jsx';
 
-function HomePage({ scannedData, removeScannedItem, updateScannedItem }) {
+import { useNavigate } from 'react-router-dom';
+
+function MenuPrincipal({ scannedData, removeScannedItem, updateScannedItem, usuario, onLogout }) {
     const navigate = useNavigate();
 
-    const handleNavigation = () => {
-        navigate('/scanner'); 
-    };
-
-    const handleNavigationQR = () => {
-        navigate('/scanner-qr'); 
-    };
+    const handleNavigateReports = () => navigate('/reportes');
+    const handleNavigation = () => navigate('/scanner');
+    const handleNavigationQR = () => navigate('/scanner-qr');
 
     return (
         <div className="container">
-            <div className="button-container">
-                <div className="card">
-                    <h3>Escanea tu Credencial</h3>
-                    <button onClick={handleNavigation}>
-                        Ir a escáner de códigos de barras
-                    </button> <br></br>
-                    <button onClick={handleNavigationQR}>
-                        Ir a escáner de códigos QR        
-                        </button>
-                </div>
+            <header style={{ marginBottom: '20px', color: 'white', textAlign: 'center' }}>
+                <h1>Préstamo de Equipos</h1>
+            </header>
+
+            <div className='user-header' style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '20px', color: 'white' }}>
+                <h2>Hola, {usuario}</h2>
+                <button onClick={onLogout} style={{ backgroundColor: '#ff6b6b', padding: '5px 15px' }}>
+                    Salir
+                </button>
             </div>
 
             <div className="data-container">
-                <h3>Datos escaneados:</h3>
-                <ul>
-                    {scannedData.length > 0 ? 
-                        scannedData.map((data, index) => (
-                            <li key={index}>
-                                <strong>Código:</strong> {data.codigo} 
-                                <br />
-                                <strong>Hora:</strong> {data.hora}
-                                <br />
-                                <strong>Estado:</strong>
-                                <select 
-                                    value={data.estado}
-                                    onChange={(e) => updateScannedItem(index, e.target.value)}
-                                >
-                                    <option value="Dentro de plazo">Dentro de plazo</option>
-                                    <option value="Fuera de plazo">Fuera de plazo</option>
-                                    <option value="Pendiente">Pendiente</option>
-                                </select>
-                                <button onClick={() => removeScannedItem(index)}>Borrar</button> 
-                            </li>
-                        )) 
-                    : <li>No se han escaneado datos.</li>}
-                </ul>
+                {scannedData.length > 0 ? (
+                    <table style={{ width: '100%', borderCollapse: 'collapse', color: 'white' }}>
+                        <thead>
+                            <tr>
+                                <th style={{ textAlign: 'left', padding: '8px', borderBottom: '1px solid #555' }}>Código persona</th>
+                                <th style={{ textAlign: 'left', padding: '8px', borderBottom: '1px solid #555' }}>Código equipo</th>
+                                <th style={{ textAlign: 'left', padding: '8px', borderBottom: '1px solid #555' }}>Hora de escaneo</th>
+                                <th style={{ textAlign: 'left', padding: '8px', borderBottom: '1px solid #555' }}>Estado</th>
+                                <th style={{ textAlign: 'left', padding: '8px', borderBottom: '1px solid #555' }}>Acciones</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {scannedData.map((data, index) => (
+                                <tr key={index}>
+                                    <td style={{ padding: '8px', borderBottom: '1px solid #333' }}>{data.personaCodigo || 'No registrado'}</td>
+                                    <td style={{ padding: '8px', borderBottom: '1px solid #333' }}>{data.equipoCodigo || 'No registrado'}</td>
+                                    <td style={{ padding: '8px', borderBottom: '1px solid #333' }}>{data.hora}</td>
+                                    <td style={{ padding: '8px', borderBottom: '1px solid #333' }}>
+                                        <select
+                                            value={data.estado}
+                                            onChange={(e) => updateScannedItem(index, e.target.value)}
+                                        >
+                                            <option value="Dentro de plazo">Dentro de plazo</option>
+                                            <option value="Fuera de plazo">Fuera de plazo</option>
+                                            <option value="Pendiente">Pendiente</option>
+                                        </select>
+                                    </td>
+                                    <td style={{ padding: '8px', borderBottom: '1px solid #333' }}>
+                                        <button onClick={() => removeScannedItem(index)}>Borrar</button>
+                                    </td>
+                                </tr>
+                            ))}
+                        </tbody>
+                    </table>
+                ) : (
+                    <p style={{ color: 'white' }}>No se han escaneado datos.</p>
+                )}
+            </div>
+
+            <div className="button-container" style={{ display: 'flex', gap: '10px', marginTop: '20px', justifyContent: 'center' }}>
+                <div className="card">
+                    <button onClick={handleNavigation}>
+                        Escanear persona y equipo (Barras)
+                    </button>
+                </div>
+                <div className="card">
+                    <button onClick={handleNavigationQR}>
+                        Escanear persona y equipo (QR)
+                    </button>
+                </div>
+                <div className="card">
+                    <button onClick={handleNavigateReports}>Ir a Reportes</button>
+                </div>
             </div>
         </div>
-    );
-}
-
-function MenuPrincipal() {
-    const [scannedData, setScannedData] = useState([]);
-
-    const addScannedItem = (item) => {
-        setScannedData((prevData) => [
-            ...prevData, 
-            { 
-                codigo: item.codigo, 
-                hora: item.hora, 
-                estado: 'Dentro de plazo' 
-            }
-        ]);
-    };
-
-    const removeScannedItem = (index) => {
-        setScannedData((prevData) => prevData.filter((_, i) => i !== index)); 
-    };
-
-    const updateScannedItem = (index, newState) => {
-        setScannedData((prevData) => {
-            const updatedData = [...prevData];
-            updatedData[index].estado = newState; 
-            return updatedData;
-        });
-    };
-
-    return (
-        <>
-            <Routes>
-                <Route 
-                    path="/" 
-                    element={
-                        <>
-                            <header>
-                                Prestamo de Equipos
-                            </header>
-                            <HomePage 
-                                scannedData={scannedData} 
-                                removeScannedItem={removeScannedItem} 
-                                updateScannedItem={updateScannedItem} 
-                            />
-                        </>
-                    } 
-                />
-                <Route path="/scanner-qr" element={<ScannerQR addScannedItem={addScannedItem} />} />
-                <Route path="/scanner" element={<ScannerPage addScannedItem={addScannedItem} />} />
-            </Routes>
-        </>
     );
 }
 

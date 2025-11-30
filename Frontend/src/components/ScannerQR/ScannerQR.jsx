@@ -1,12 +1,21 @@
+
 import { Html5QrcodeScanner } from "html5-qrcode";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useNavigate } from 'react-router-dom';
 
 function ScannerQR({ addScannedItem }) {
   const [scanResult, setScanResult] = useState(null);
+  const [scanStep, setScanStep] = useState('persona');
+  const personaCodeRef = useRef('');
+  const equipoCodeRef = useRef('');
+  const [personaCode, setPersonaCode] = useState('');
+  const [equipoCode, setEquipoCode] = useState('');
   const navigate = useNavigate();
 
   useEffect(() => {
+    personaCodeRef.current = '';
+    equipoCodeRef.current = '';
+
     const elementId = 'reader';
     const scanner = new Html5QrcodeScanner(elementId, {
       qrbox: {
@@ -22,10 +31,25 @@ function ScannerQR({ addScannedItem }) {
     });
 
     const success = (result) => {
-      scanner.clear();
-      setScanResult(result);
-      addScannedItem({ codigo: result, hora: new Date().toLocaleTimeString() });
-      navigate('/'); 
+      if (!personaCodeRef.current) {
+        personaCodeRef.current = result;
+        setPersonaCode(result);
+        setScanStep('equipo');
+        return;
+      }
+
+      if (!equipoCodeRef.current) {
+        equipoCodeRef.current = result;
+        setEquipoCode(result);
+        setScanResult(result);
+        addScannedItem({
+          personaCodigo: personaCodeRef.current,
+          equipoCodigo: result,
+          hora: new Date().toLocaleString(),
+        });
+        scanner.clear();
+        navigate('/');
+      }
     };
 
     const error = (err) => {
@@ -44,6 +68,12 @@ function ScannerQR({ addScannedItem }) {
   return (
     <div className="CodeQR" style={{ textAlign: 'center', margin: '20px' }}>
       <h1>Scaneo de QR</h1>
+      <div style={{ marginBottom: '20px' }}>
+        <p style={{ fontWeight: 'bold', marginBottom: '10px' }}>Escanea primero a la persona y luego el equipo.</p>
+        <p style={{ marginTop: '10px', color: 'gray' }}>Paso actual: <strong>{scanStep === 'persona' ? 'Persona' : 'Equipo'}</strong></p>
+        <p style={{ margin: '5px 0' }}><strong>Persona:</strong> {personaCode || 'Pendiente'}</p>
+        <p style={{ margin: '5px 0' }}><strong>Equipo:</strong> {equipoCode || 'Pendiente'}</p>
+      </div>
       {
         scanResult
           ? (

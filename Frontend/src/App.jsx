@@ -3,6 +3,7 @@ import './App.css';
 import { Routes, Route, useNavigate, Navigate } from 'react-router-dom';
 import ScannerPage from './components/ScannerBar/ScannerPage.jsx';
 import ScannerQR from './components/ScannerQR/ScannerQR.jsx';
+import ReportsPage from './components/Reportes/ReportsPage.jsx';
 import Login from './components/Login/Login.jsx';
 
 function HomePage({ scannedData, removeScannedItem, updateScannedItem, usuario, onLogout }) {
@@ -15,6 +16,9 @@ function HomePage({ scannedData, removeScannedItem, updateScannedItem, usuario, 
     const handleNavigationQR = () => {
         navigate('/scanner-qr'); 
     };
+
+    const handleNavigateReports = () => navigate('/reportes');
+
 
     return (
         <div className="container">
@@ -59,9 +63,12 @@ function HomePage({ scannedData, removeScannedItem, updateScannedItem, usuario, 
                     <button onClick={handleNavigationQR}>
                         Ir a escáner de QR
                     </button>
+                    <br />
+                    <button onClick={handleNavigateReports}>Ir a Reportes
+                    </button>
+            </div>
                 </div>
             </div>
-        </div>
     );
 }
 
@@ -137,8 +144,10 @@ function App() {
                         )
                     } 
                 />
-                <Route path="/scanner-qr" element={ usuario ? <ScannerQR addScannedItem={addScannedItem} /> : <Navigate to ="/login"/>} />
-                <Route path="/scanner" element={ usuario ? <ScannerPage addScannedItem={addScannedItem} /> : <Navigate to ="/login" />} />
+                <Route path="/scanner-qr" element={usuario ? <ScannerQR addScannedItem={addScannedItem} /> : <Navigate to="/login" />} />
+                <Route path="/scanner" element={usuario ? <ScannerPage addScannedItem={addScannedItem} /> : <Navigate to="/login" />} />
+                <Route path="/reportes" element={usuario ? <ReportsPage /> : <Navigate to="/login" />} />
+
             </Routes>
         </>
     );

@@ -15,6 +15,15 @@ services:
       - "3307:3306"
     volumes:
       - db_data:/var/lib/mysql
+    
+    # === CHEQUEO DE SALUD (Correcto) ===
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-u", "root", "-psecure_root_password_999"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 30s
+    # ===============================
 
   # 2. BACKEND (Flask/Python)
   backend:
@@ -28,22 +37,27 @@ services:
       DATABASE_USER: user_app
       DATABASE_PASSWORD: app_user_password_999
       DATABASE_NAME: sistema_db
+      
+    # === CORRECCIÓN DE SINTAXIS A UN MAPEO SIMPLE ===
     depends_on:
-      - db
+      db:
+        condition: service_healthy # Espera hasta que la DB pase el healthcheck
+    # ===============================================
+    
     volumes:
       - ./backend:/app
-
+      
   # 3. FRONTEND (React) -- Configurado para Hot Reload
   frontend:
     build:
       context: ./frontend
-      dockerfile: Dockerfile  # Usamos el Dockerfile para desarrollo
+      dockerfile: Dockerfile 
     container_name: react_sistema_frontend
     ports:
-      - "3000:3000"  # Puerto para Hot Reload (desarrollo)
+      - "3000:3000"
     environment:
       - HOST=0.0.0.0
-      - CHOKIDAR_USEPOLLING=true  # Para mejorar la detección de cambios
+      - CHOKIDAR_USEPOLLING=true
     stdin_open: true
     depends_on:
       - backend
@@ -54,3 +68,6 @@ services:
 # Definición del Volumen de Datos para MySQL
 volumes:
   db_data: {}
+
+
+  

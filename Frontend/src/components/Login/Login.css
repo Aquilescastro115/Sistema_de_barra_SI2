@@ -153,3 +153,21 @@
     font-size: 18px;
     margin-bottom: 30px;
 }
+
+.field-error {
+    color: #ff6b6b;
+    font-size: 12px;
+    margin-top: -25px; 
+    margin-bottom: 15px;
+    display: block;
+    margin-left: 15px;
+    font-weight: bold;
+}
+
+.input-box.error-border input {
+    border-color: #ff6b6b;
+}
+
+.input-box {
+    margin-bottom: 30px; 
+}

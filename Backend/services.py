@@ -1,7 +1,8 @@
 # backend/services.py
-from db import DBConnection
+from app import get_db_connection
 
-def get_professors_with_loans(app):
+
+def get_professors_with_loans():
     conn = get_db_connection()
     try:
         with conn.cursor() as cursor:
@@ -21,7 +22,7 @@ def get_professors_with_loans(app):
         conn.close()
 
 
-def get_professor_report(app, prof_id):
+def get_professor_report(prof_id):
     conn = get_db_connection()
     try:
         with conn.cursor() as cursor:

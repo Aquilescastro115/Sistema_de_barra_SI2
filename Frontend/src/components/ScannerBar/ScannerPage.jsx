@@ -1,5 +1,6 @@
 import React, { useRef, useState } from 'react';
 import { useBarcodeScanner } from './useBarcodeScanner.js';
+import { FaArrowLeft } from "react-icons/fa";
 import { useNavigate } from 'react-router-dom';
 
 function ScannerPage({ addScannedItem }) {

@@ -49,12 +49,20 @@ function ScannerPage({ addScannedItem }) {
       <div>
         <style>{`
           :root {
+            font-family: 'Cambria', Cochin, Georgia, Times, Times New Roman, serif;
+            line-height: 1.5;
+            font-weight: 400;
+            color-scheme: light dark;
+            font-synthesis: none;
+            text-rendering: optimizeLegibility;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+
             --primary: steelblue;
+            --primary-light: lightsteelblue;
             --text-dark: #333;
             --text-muted: #666;
-            --card-bg: #ffffff;
             --radius: 12px;
-            --shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
           }
 
           body, html {
@@ -63,37 +71,33 @@ function ScannerPage({ addScannedItem }) {
           }
 
           .scanner-container {
-            max-width: 580px;
+            max-width: 600px;
             margin: 60px auto;
             padding: 40px;
             text-align: center;
-            background: var(--card-bg);
-            border-radius: var(--radius);
-            box-shadow: var(--shadow);
+            border-radius: 12px;
           }
 
           .scanner-container h1 {
-            margin-bottom: 28px;
-            color: var(--primary);
-            font-size: 30px;
+            margin-bottom: 30px;
+            font-size: 32px;
           }
 
           .info-text {
             font-weight: bold;
             margin-bottom: 20px;
             line-height: 1.5;
-            font-size: 19px;
+            font-size: 20px;
           }
 
           .step-text {
             margin-top: 10px;
-            margin-bottom: 28px;
+            margin-bottom: 25px;
             font-size: 18px;
-            color: var(--text-muted);
           }
 
           .scanned-box {
-            margin-bottom: 28px;
+            margin-bottom: 25px;
           }
 
           .scanned-box p {
@@ -103,38 +107,94 @@ function ScannerPage({ addScannedItem }) {
 
           .label {
             font-weight: bold;
-            color: var(--primary);
           }
 
           .scan-reset-btn {
-            background: var(--primary);
-            color: white;
             border: none;
             padding: 12px 22px;
             cursor: pointer;
-            font-size: 16px;
-            border-radius: var(--radius);
+            font-size: 17px;
+            border-radius: 12px;
             transition: 0.2s;
-            margin-bottom: 20px;
-          }
-
-          .scan-reset-btn:hover {
-            background: #3b6f99;
+            margin-bottom: 18px;
           }
 
           .detected {
             font-size: 22px;
             font-weight: bold;
-            margin-top: 15px;
+            margin-top: 20px;
             margin-bottom: 5px;
-            color: var(--text-dark);
           }
 
           .helper-text {
             font-size: 13px;
-            color: var(--text-muted);
           }
-      `}</style>
+
+          @media (prefers-color-scheme: light) {
+            body {
+              background-color: #f4f4f4;
+            }
+
+            .scanner-container {
+              background-color: white;
+              color: #333;
+              box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+            }
+
+            h1 {
+              color: var(--primary);
+            }
+
+            .label {
+              color: var(--primary);
+            }
+
+            .scan-reset-btn {
+              background-color: var(--primary-light);
+              color: #213547;
+            }
+
+            .scan-reset-btn:hover {
+              background-color: var(--primary);
+              color: white;
+            }
+          }
+
+          @media (prefers-color-scheme: dark) {
+            body {
+              background-color: #1f1f1f;
+            }
+
+            .scanner-container {
+              background-color: #2a2a2a;
+              color: #f5f5f5;
+              box-shadow: 0 4px 10px rgba(0,0,0,0.4);
+            }
+
+            h1 {
+              color: var(--primary-light);
+            }
+
+            .label {
+              color: var(--primary-light);
+            }
+
+            .scan-reset-btn {
+              background-color: var(--primary);
+              color: white;
+            }
+
+            .scan-reset-btn:hover {
+              background-color: var(--primary-light);
+              color: white;
+            }
+
+            .helper-text {
+              color: #ccc;
+            }
+          }
+        `}</style>
+
 
 
       <div className="scanner-container">

@@ -16,9 +16,7 @@ function MenuPrincipal({ scannedData, removeScannedItem, updateScannedItem, usua
 
             <div className='user-header' style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '20px', color: 'white' }}>
                 <h2>Hola, {usuario}</h2>
-                <button onClick={onLogout} style={{ backgroundColor: '#ff6b6b', padding: '5px 15px' }}>
-                    Salir
-                </button>
+
             </div>
 
             <div className="data-container">
@@ -74,6 +72,11 @@ function MenuPrincipal({ scannedData, removeScannedItem, updateScannedItem, usua
                 </div>
                 <div className="card">
                     <button onClick={handleNavigateReports}>Ir a Reportes</button>
+                </div>
+                <div className="card">  
+                    <button onClick={onLogout} style={{ backgroundColor: '#C82909', padding: '5px 15px' }}>
+                    Salir
+                    </button>
                 </div>
             </div>
         </div>

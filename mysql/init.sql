@@ -145,6 +145,9 @@ INSERT INTO Profesor (id_Profesor, Nombre, Email_institucional, Rut, Password, A
 INSERT INTO Profesor (id_Profesor, Nombre, Email_institucional, Rut, Password, Activo) VALUES (3, 'Yayita', 'Yayitaaa@Unach.cl', '2222222-5', 'HuevoDuro', 1);
 
 
+INSERT INTO Prestamo (fk_id_Profesor, fecha_solicitud, estado, fecha_devolucion) VALUES (1, '2023-11-30', 'Activo', '2023-12-05');
+INSERT INTO Detalle_prestamo (fk_id_equipo, fk_id_Prestamo, fecha_entrega, fecha_devolucion, estado) VALUES (2, 1, '2023-11-30', '2023-12-05', 'Entregado');
+
 SET SQL_MODE=@OLD_SQL_MODE;
 SET FOREIGN_KEY_CHECKS=@OLD_FOREIGN_KEY_CHECKS;
 SET UNIQUE_CHECKS=@OLD_UNIQUE_CHECKS;

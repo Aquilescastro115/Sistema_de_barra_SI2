@@ -1,6 +1,6 @@
 # backend/api/reports.py
 from flask import Blueprint, jsonify, current_app, request
-from ..services import get_professors_with_loans, get_professor_report
+from services import get_professors_with_loans, get_professor_report
 
 reports_bp = Blueprint('reports', __name__)
 

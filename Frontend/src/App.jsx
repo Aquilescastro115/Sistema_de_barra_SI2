@@ -3,6 +3,7 @@ import './App.css';
 import { Routes, Route, useNavigate } from 'react-router-dom';
 import ScannerPage from './components/ScannerBar/ScannerPage.jsx';
 import ScannerQR from './components/ScannerQR/ScannerQR.jsx';
+import ReportsPage from './components/Reportes/ReportsPage.jsx'
 
 function HomePage({ scannedData, removeScannedItem, updateScannedItem }) {
     const navigate = useNavigate();
@@ -14,6 +15,9 @@ function HomePage({ scannedData, removeScannedItem, updateScannedItem }) {
     const handleNavigationQR = () => {
         navigate('/scanner-qr'); 
     };
+
+    const handleNavigateReports = () => navigate('/reportes');
+
 
     return (
         <div className="container">
@@ -52,9 +56,12 @@ function HomePage({ scannedData, removeScannedItem, updateScannedItem }) {
                     <button onClick={handleNavigationQR}>
                         Ir a escáner de QR
                     </button>
+                    <br />
+                    <button onClick={handleNavigateReports}>Ir a Reportes
+                    </button>
+            </div>
                 </div>
             </div>
-        </div>
     );
 }
 
@@ -104,6 +111,8 @@ function App() {
                 />
                 <Route path="/scanner-qr" element={<ScannerQR addScannedItem={addScannedItem} />} />
                 <Route path="/scanner" element={<ScannerPage addScannedItem={addScannedItem} />} />
+                <Route path="/reportes" element={<ReportsPage />} />
+
             </Routes>
         </>
     );

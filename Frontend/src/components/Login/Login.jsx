@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import './Login.css';
 import { validarInput, isRequired, minLength, noSpaces } from './validators';
-// import { FaUserTie, FaLock } from "react-icons/fa";
+import { FaUserTie, FaLock } from "react-icons/fa";
 
 const loginAPI = async (usuario, password) => {
     const URL = 'http://localhost:5000/api/profesores'; 
@@ -113,7 +113,7 @@ const Login = ({ onLoginSuccess }) => {
                         onChange={(e) => setUsuario(e.target.value)}
                         onBlur={validarUsuario}
                     />
-                    {/* <FaUserTie className='icon'/> */}
+                    <FaUserTie className='icon'/>
                 </div>
                 {errorUsuario && <span className="field-error">{errorUsuario}</span>}
 
@@ -125,7 +125,7 @@ const Login = ({ onLoginSuccess }) => {
                         onChange={(e) => setPassword(e.target.value)}
                         onBlur={validarPassword}
                     />
-                    {/* <FaLock className='icon'/> */}
+                    <FaLock className='icon'/>
                 </div>
                 {errorPassword && <span className="field-error">{errorPassword}</span>}
 

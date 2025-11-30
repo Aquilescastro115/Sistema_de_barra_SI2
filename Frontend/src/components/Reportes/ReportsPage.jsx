@@ -1,5 +1,7 @@
 // frontend/src/components/reports/ReportsPage.jsx
 import React, { useEffect, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
+import { FaArrowLeft } from "react-icons/fa";
 import API from '../../api';
 import ExportPdfButton from './ExportPdfButton'; // reutiliza el componente que ya tienes
 import ProfessorDetailModal from './ProfessorDetailModal';
@@ -11,6 +13,7 @@ export default function ReportsPage(){
   const [professors, setProfessors] = useState([]);
   const [loading, setLoading] = useState(true);
   const [selectedProf, setSelectedProf] = useState(null);
+  const navigate = useNavigate();
 
   useEffect(()=>{
     let mounted = true;
@@ -41,6 +44,26 @@ export default function ReportsPage(){
 
   return (
     <div style={{ padding: 16 }}>
+      <div style={{ marginBottom: 20 }}>
+        <button 
+          onClick={() => navigate('/')}
+          style={{
+            display: 'flex',
+            alignItems: 'center',
+            gap: '8px',
+            background: 'rgba(51, 51, 51, 0.8)', 
+            color: 'white',
+            border: 'none',
+            padding: '10px 20px',
+            borderRadius: '20px',
+            cursor: 'pointer',
+            fontSize: '14px',
+            boxShadow: '0 2px 5px rgba(0,0,0,0.2)'
+          }}
+        >
+          <FaArrowLeft /> Volver al Menú
+        </button>
+      </div>
       <h2>Reportes — Profesores con préstamos</h2>
       <p style={{ fontSize: 13, color: '#555' }}>
         Lista de profesores que han prestado al menos un equipo. (Estructura del proyecto: {PROJECT_STRUCTURE_SCREENSHOT})

@@ -52,6 +52,11 @@ def get_equipos():
         if conn: conn.close()
         return jsonify({"error": str(e)}), 500
 
+from api.reports import reports_bp
+app.register_blueprint(reports_bp, url_prefix="/api")
+
+
+
 if __name__ == '__main__':
     # Esto imprime las rutas al iniciar
     print(app.url_map)

@@ -1,0 +1,228 @@
+from flask import Blueprint, request, jsonify
+from database import get_db
+from validaciones.alumnos_val import validar_alumno
+from validaciones.libros_val import validar_libro
+from validaciones.prestamos_val import validar_prestamo, validar_devolucion
+
+
+alumnos_bp = Blueprint("alumnos", __name__)
+
+# GET - obtener todos los alumnos
+@consultas_bp.get("/alumnos")
+def obtener_alumnos():
+    db = get_db()
+    cursor = db.cursor()
+
+    cursor.execute("SELECT * FROM alumnos")
+    alumnos = cursor.fetchall()
+
+    cursor.close()
+    return jsonify(alumnos)
+
+
+# POST - crear alumno
+@consultas_bp.post("/alumnos")
+def crear_alumno():
+    data = request.json
+    error = validar_alumno(data)
+
+    if error:
+        return jsonify({"error": error}), 400
+
+    db = get_db()
+    cursor = db.cursor()
+
+    sql = "INSERT INTO alumnos (nombre, apellido, email) VALUES (%s, %s, %s)"
+    valores = (data["nombre"], data["apellido"], data["email"])
+
+    cursor.execute(sql, valores)
+    db.commit()
+    cursor.close()
+
+    return jsonify({"mensaje": "Alumno creado correctamente"}), 201
+
+# PUT - actualizar alumno
+@consultas_bp.put("/alumnos/<int:id_alumno>")
+def editar_alumno(id_alumno):
+    data = request.json
+    error = validar_alumno(data)
+
+    if error:
+        return jsonify({"error": error}), 400
+
+    db = get_db()
+    cursor = db.cursor()
+
+    sql = """
+        UPDATE alumnos 
+        SET nombre=%s, apellido=%s, email=%s
+        WHERE id_alumno=%s
+    """
+
+    valores = (data["nombre"], data["apellido"], data["email"], id_alumno)
+
+    cursor.execute(sql, valores)
+    db.commit()
+    cursor.close()
+
+    return jsonify({"mensaje": "Alumno actualizado correctamente"})
+
+
+# DELETE - eliminar alumno
+@consultas_bp.delete("/alumnos/<int:id_alumno>")
+def eliminar_alumno(id_alumno):
+    db = get_db()
+    cursor = db.cursor()
+
+    cursor.execute("DELETE FROM alumnos WHERE id_alumno=%s", (id_alumno,))
+    db.commit()
+    cursor.close()
+
+    return jsonify({"mensaje": "Alumno eliminado"})
+
+libros_bp = Blueprint("libros", __name__)
+
+# GET - obtener libros
+@consultas_bp.get("/libros")
+def obtener_libros():
+    db = get_db()
+    cursor = db.cursor()
+
+    cursor.execute("SELECT * FROM libros")
+    libros = cursor.fetchall()
+
+    cursor.close()
+    return jsonify(libros)
+
+# POST - crear libro
+@consultas_bp.post("/libros")
+def crear_libro():
+    data = request.json
+    error = validar_libro(data)
+
+    if error:
+        return jsonify({"error": error}), 400
+
+    db = get_db()
+    cursor = db.cursor()
+
+    sql = "INSERT INTO libros (titulo, autor, stock) VALUES (%s, %s, %s)"
+    valores = (data["titulo"], data["autor"], data["stock"])
+
+    cursor.execute(sql, valores)
+    db.commit()
+    cursor.close()
+
+    return jsonify({"mensaje": "Libro registrado correctamente"}), 201
+
+# PUT - actualizar libro
+@consultas_bp.put("/libros/<int:id_libro>")
+def editar_libro(id_libro):
+    data = request.json
+    error = validar_libro(data)
+
+    if error:
+        return jsonify({"error": error}), 400
+
+    db = get_db()
+    cursor = db.cursor()
+
+    sql = """
+        UPDATE libros 
+        SET titulo=%s, autor=%s, stock=%s
+        WHERE id_libro=%s
+    """
+
+    valores = (data["titulo"], data["autor"], data["stock"], id_libro)
+
+    cursor.execute(sql, valores)
+    db.commit()
+    cursor.close()
+
+    return jsonify({"mensaje": "Libro actualizado correctamente"})
+
+# DELETE - borrar libro
+@consultas_bp.delete("/libros/<int:id_libro>")
+def eliminar_libro(id_libro):
+    db = get_db()
+    cursor = db.cursor()
+
+    cursor.execute("DELETE FROM libros WHERE id_libro=%s", (id_libro,))
+    db.commit()
+    cursor.close()
+
+    return jsonify({"mensaje": "Libro eliminado"})
+
+
+prestamos_bp = Blueprint("prestamos", __name__)
+
+# GET - obtener préstamos
+@prestamos_bp.get("/prestamos")
+def obtener_prestamos():
+    db = get_db()
+    cursor = db.cursor(dictionary=True)
+    cursor.execute("SELECT * FROM prestamos")
+    return jsonify(cursor.fetchall())
+
+# POST - crear préstamo
+@consultas_bp.post("/prestamos")
+def realizar_prestamo():
+    data = request.json
+
+    error = validar_prestamo(data)
+    if error:
+        return jsonify({"error": error}), 400
+
+    db = get_db()
+    cursor = db.cursor()
+
+    sql = """
+        INSERT INTO prestamos(id_alumno, id_libro, fecha_prestamo)
+        VALUES (%s, %s, NOW())
+    """
+    valores = (data["id_alumno"], data["id_libro"])
+
+    cursor.execute(sql, valores)
+    cursor.execute("UPDATE libros SET stock = stock - 1 WHERE id_libro=%s", (data["id_libro"],))
+    db.commit()
+    cursor.close()
+
+    return jsonify({"mensaje": "Préstamo registrado con éxito"})
+
+# POST - marcar devolución
+@consultas_bp.post("/devoluciones")
+def devolver_libro():
+    data = request.json
+
+    error = validar_devolucion(data)
+    if error:
+        return jsonify({"error": error}), 400
+
+    db = get_db()
+    cursor = db.cursor()
+
+    sql = """
+        UPDATE prestamos 
+        SET fecha_devolucion = NOW()
+        WHERE id_prestamo=%s
+    """
+
+    cursor.execute(sql, (data["id_prestamo"],))
+    cursor.execute("UPDATE libros SET stock = stock + 1 WHERE id_libro=%s", (data["id_libro"],))
+    db.commit()
+    cursor.close()
+
+    return jsonify({"mensaje": "Devolución registrada"})
+
+# DELETE — eliminar registro de préstamo
+@consultas_bp.delete("/prestamos/<int:id>")
+def borrar_prestamo(id):
+    db = get_db()
+    cursor = db.cursor()
+
+    cursor.execute("DELETE FROM prestamos WHERE id = %s", (id,))
+    db.commit()
+
+    cursor.close()
+    return jsonify({"mensaje": "Préstamo eliminado"}), 200
+

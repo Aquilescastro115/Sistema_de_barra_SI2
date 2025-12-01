@@ -66,7 +66,7 @@ def get_db_connection():
         print(f"Error conectando a MySQL: {e}")
         return None
 
-# --- RUTA 1: RAIZ (Para ver si vive) ---
+# --- RUTA 1: RAIZ ---
 @app.route('/', methods=['GET'])
 def home():
     return jsonify({
@@ -74,7 +74,7 @@ def home():
         "rutas_disponibles": ["/api/equipos", "/"]
     })
 
-# --- RUTA 2: EQUIPOS (La que buscas) ---
+# --- RUTA 2: EQUIPOS ---
 @app.route('/api/equipos', methods=['GET'])
 def get_equipos():
     conn = get_db_connection()
@@ -106,6 +106,61 @@ def get_profesores():
     except Exception as e:
         if conn: conn.close()
         return jsonify({"error": str(e)}), 500
+
+
+@app.route('/api/equipos', methods=['POST'])
+def add_equipo():
+    data = request.get_json()
+
+    # Validar campos del frontend (sin id_equipo)
+    required_fields = ['Codigo_qr', 'Tipo_equipo', 'Estado']
+
+    for field in required_fields:
+        if field not in data:
+            return jsonify({"error": f"Falta el campo obligatorio: {field}"}), 400
+
+    conn = get_db_connection()
+    if conn is None:
+        return jsonify({"error": "Falló conexión DB"}), 500
+
+    try:
+        with conn.cursor() as cursor:
+
+            # 1. Obtener el último ID existente
+            cursor.execute("SELECT COALESCE(MAX(id_equipo), 0) AS max_id FROM Equipo")
+            ultimo_id = cursor.fetchone()['max_id']
+            nuevo_id = ultimo_id + 1
+
+            # 2. Insertar con el nuevo ID
+            sql = """
+                INSERT INTO Equipo (id_equipo, Codigo_qr, Tipo_equipo, Descripcion, Estado)
+                VALUES (%s, %s, %s, %s, %s)
+            """
+            cursor.execute(sql, (
+                nuevo_id,
+                data['Codigo_qr'],
+                data['Tipo_equipo'],
+                data.get('Descripcion', None),
+                data['Estado']
+            ))
+
+            conn.commit()
+
+        conn.close()
+        return jsonify({
+            "mensaje": "Equipo creado exitosamente",
+            "id_generado": nuevo_id
+        }), 201
+
+    except pymysql.err.IntegrityError as e:
+        if conn: conn.close()
+        return jsonify({"error": "Codigo_qr ya existe."}), 409
+    except Exception as e:
+        if conn: conn.close()
+        return jsonify({"error": str(e)}), 500
+
+
+
 
 @app.route('/api/profesores', methods=['POST'])
 def add_profesor():

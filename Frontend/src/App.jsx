@@ -5,6 +5,8 @@ import ScannerPage from './components/ScannerBar/ScannerPage.jsx';
 import ScannerQR from './components/ScannerQR/ScannerQR.jsx';
 import ReportsPage from './components/Reportes/ReportsPage.jsx';
 import Login from './components/Login/Login.jsx';
+import GenerarCodigo from './components/Generador/GenerarCodigo.jsx';
+
 
 function HomePage({ scannedData, removeScannedItem, updateScannedItem, usuario, onLogout }) {
     const navigate = useNavigate();
@@ -12,6 +14,7 @@ function HomePage({ scannedData, removeScannedItem, updateScannedItem, usuario, 
     const handleNavigation = () => navigate('/scanner');
     const handleNavigationQR = () => navigate('/scanner-qr');
     const handleNavigateReports = () => navigate('/reportes');
+    const handleNavigateGenerarCodigo = () => navigate('/generar-codigo');  // <-- FALTABA ESTA
 
     return (
         <div className="container">
@@ -65,14 +68,17 @@ function HomePage({ scannedData, removeScannedItem, updateScannedItem, usuario, 
                     Ir a Reportes
                 </button>
 
+                <button onClick={handleNavigateGenerarCodigo} style={{ backgroundColor: '#C82909', padding: '5px 15px' }}>
+                    Generar QR / Código de Barras
+                </button>
+
                 <button onClick={onLogout} 
                     style={{ backgroundColor: '#C82909', color: 'white', padding: '5px 15px' }}>
                     Salir
                 </button>
             </div>
 
-
-            </div>
+        </div>
     );
 }
 
@@ -153,6 +159,7 @@ function App() {
                 <Route path="/scanner-qr" element={usuario ? <ScannerQR addScannedItem={addScannedItem} /> : <Navigate to="/login" />} />
                 <Route path="/scanner" element={usuario ? <ScannerPage addScannedItem={addScannedItem} /> : <Navigate to="/login" />} />
                 <Route path="/reportes" element={usuario ? <ReportsPage /> : <Navigate to="/login" />} />
+                <Route path="/generar-codigo" element={usuario ? <GenerarCodigo /> : <Navigate to="/login" /> } />
 
             </Routes>
         </>

@@ -1,57 +1,69 @@
-import React, { useRef, useState } from 'react';
+import React, { useRef, useState, useEffect } from 'react';
 import { useBarcodeScanner } from './useBarcodeScanner.js';
 import { useNavigate } from 'react-router-dom';
 
 function ScannerPage({ addScannedItem }) {
 
-  const [scannedCode, setScannedCode] = useState("Esperando...");
+  const [scanStep, setScanStep] = useState('persona');
+  const [scanResult, setScanResult] = useState(null);
+
   const personaCodeRef = useRef('');
   const equipoCodeRef = useRef('');
+
   const [personaCode, setPersonaCode] = useState('');
   const [equipoCode, setEquipoCode] = useState('');
-  const [scanStep, setScanStep] = useState('persona');
+  
+  const [lastScanned, setLastScanned] = useState("Esperando...");
+
   const navigate = useNavigate();
 
   useBarcodeScanner({
     onScan: (code) => {
-      console.log("Escaneado:", code);
-      setScannedCode(code);
+      setLastScanned(code);
 
-      if (scanStep === 'persona') {
+      if (!personaCodeRef.current) {
         personaCodeRef.current = code;
         setPersonaCode(code);
-        setScanStep('equipo');
+        setScanStep("equipo");
         return;
       }
 
-      equipoCodeRef.current = code;
-      setEquipoCode(code);
-      addScannedItem({
-        personaCodigo: personaCodeRef.current,
-        equipoCodigo: code,
-        hora: new Date().toLocaleString(),
-      });
+      if (!equipoCodeRef.current) {
+        equipoCodeRef.current = code;
+        setEquipoCode(code);
+        setScanResult(code);
 
-      resetScan();
-      navigate('/');
+        addScannedItem({
+          personaCodigo: personaCodeRef.current,
+          equipoCodigo: code,
+          hora: new Date().toLocaleString(),
+        });
+
+        navigate('/');
+      }
     }
   });
 
   const resetScan = () => {
-    personaCodeRef.current = '';
-    equipoCodeRef.current = '';
-    setPersonaCode('');
-    setEquipoCode('');
-    setScannedCode('Esperando...');
-    setScanStep('persona');
+    personaCodeRef.current = "";
+    equipoCodeRef.current = "";
+    setPersonaCode("");
+    setEquipoCode("");
+    setScanResult(null);
+    setLastScanned("Esperando...");
+    setScanStep("persona");
   };
 
   return (
-    <div className="scanner-page">
+    <div>
 
       <style>{`
         :root {
-          font-family: 'Cambria', Cochin, Georgia, Times, 'Times New Roman', serif;
+          font-family: 'Cambria', Cochin, Georgia, Times, Times New Roman, serif;
+          color-scheme: light dark;
+          --primary: steelblue;
+          --primary-light: lightsteelblue;
+          --text-muted: #666;
         }
 
         body {
@@ -60,120 +72,119 @@ function ScannerPage({ addScannedItem }) {
           background: #000000;
         }
 
-        .scanner-page {
+        .scanner-container {
+          max-width: 600px;
+          margin: 50px auto;
+          padding: 40px;
+          border-radius: 12px;
           text-align: center;
-          margin-top: 30px;
         }
 
-        .volver-btn {
-          display: flex;
-          align-items: center;
-          gap: 8px;
-          background: rgba(51, 51, 51, 0.85);
-          color: white;
-          border: none;
-          padding: 10px 20px;
-          border-radius: 20px;
-          cursor: pointer;
-          font-size: 14px;
-          box-shadow: 0 2px 5px rgba(0,0,0,0.2);
-          margin: 0 auto 25px auto;
-          transition: 0.2s;
+        h1 { font-size: 32px; margin-bottom: 25px; }
+
+        .info-text { 
+          font-size: 20px;
+          font-weight: bold;
+          margin-bottom: 15px;
+          line-height: 1.5;
         }
 
-        .volver-btn:hover {
-          background: rgba(70, 70, 70, 0.9);
-        }
-
-        h1 {
-          color: steelblue;
-          margin-bottom: 20px;
-        }
-
-        .info-text {
+        .step-text {
+          margin: 10px 0 20px;
           font-size: 18px;
-          font-weight: bold;
+          color: var(--text-muted);
         }
 
-        .scan-step-box {
-          margin: 20px auto;
-          padding: 10px 20px;
-          background: #f0f0f0;
-          border-radius: 8px;
-          display: inline-block;
-        }
-
-        .label {
-          font-weight: bold;
-          color: steelblue;
-        }
-
-        .data-lines {
-          margin-top: 25px;
-          display: flex;
-          flex-direction: column;
-          gap: 18px;
+        .scanned-box p {
+          margin: 8px 0;
           font-size: 18px;
         }
 
-        .reset-btn {
-          margin-top: 25px;
-          padding: 10px 20px;
+        .label { font-weight: bold; }
+
+        .scan-reset-btn {
+          margin-top: 20px;
+          padding: 12px 22px;
+          font-size: 17px;
           border: none;
-          border-radius: 10px;
-          background-color: lightsteelblue;
-          color: #213547;
+          border-radius: 12px;
           cursor: pointer;
           transition: 0.2s;
         }
 
-        .reset-btn:hover {
-          background-color: steelblue;
-          color: white;
+        .detected {
+          margin-top: 25px;
+          font-size: 22px;
+          font-weight: bold;
         }
 
-        .helper-text {
-          color: #777;
-          margin-top: 25px;
-          font-size: 14px;
+        .helper-text { font-size: 13px; margin-top: 5px; }
+
+        @media (prefers-color-scheme: light) {
+          body { background: #f4f4f4; }
+          .scanner-container {
+            background: white;
+            color: #333;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+          }
+          h1 { color: var(--primary); }
+          .label { color: var(--primary); }
+          .scan-reset-btn { background: var(--primary-light); color: #213547; }
+          .scan-reset-btn:hover { background: var(--primary); color: white; }
         }
 
         @media (prefers-color-scheme: dark) {
-          body {
-            background-color: #1f1f1f;
+          body { background: #1f1f1f; }
+          .scanner-container {
+            background: #2a2a2a;
             color: #f5f5f5;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.4);
           }
+          h1 { color: var(--primary-light); }
+          .label { color: var(--primary-light); }
+          .scan-reset-btn { background: var(--primary); color: white; }
+          .scan-reset-btn:hover { background: var(--primary-light); color: white; }
         }
       `}</style>
 
-      <div className="scanner-container">
-        <h1>Página de Escaneo</h1>
 
-        <div>
-          <p className="info-text">
-            Escanea primero el código del profesor <br />
-            y luego el equipo.
-          </p>
-          <p className="step-text">
-            Paso actual: <strong>{scanStep === 'persona' ? 'Persona' : 'Equipo'}</strong>
-          </p>
-        </div>
+      <div className="scanner-container">
+        <h1>Escaneo por Pistola</h1>
+
+        <p className="info-text">
+          Escanea primero al profesor<br/>y luego el equipo.
+        </p>
+
+        <p className="step-text">
+          Paso actual: <strong>{scanStep === 'persona' ? 'Persona' : 'Equipo'}</strong>
+        </p>
 
         <div className="scanned-box">
           <p><span className="label">Profesor:</span> {personaCode || 'Pendiente'}</p>
           <p><span className="label">Equipo:</span> {equipoCode || 'Pendiente'}</p>
         </div>
 
-        <button className="scan-reset-btn" onClick={resetScan}>
-          Reiniciar escaneo
-        </button>
+        {scanResult ? (
+          <>
+            <h2>¡Escaneo Exitoso!</h2>
+            <p>Código: <strong>{scanResult}</strong></p>
+            <button className="scan-reset-btn" onClick={resetScan}>Nuevo Escaneo</button>
+          </>
+        ) : (
+          <>
+            <p className="detected">
+              Último detectado: {lastScanned}
+            </p>
 
-        <p className="detected">Producto detectado: {scannedCode}</p>
+            <button className="scan-reset-btn" onClick={resetScan}>
+              Reiniciar escaneo
+            </button>
+          </>
+        )}
 
-        <p className="helper-text">
-          (Usa la pistola USB o escribe rápido y presiona Enter)
-        </p>
+        <p className="helper-text">(Usa la pistola USB o escribe rápido + Enter)</p>
       </div>
+
     </div>
   );
 }

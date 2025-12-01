@@ -28,7 +28,7 @@ function ScannerQR({ addScannedItem }) {
     });
 
     const success = (result) => {
-      // 1. PASO 1: Escanear Persona
+
       if (!personaCodeRef.current) {
         console.log("Persona detectada:", result);
         personaCodeRef.current = result;

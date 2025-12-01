@@ -199,6 +199,25 @@ function ScannerPage({ addScannedItem }) {
 
 
       <div className="scanner-container">
+        <div style={{ display: 'flex', justifyContent: 'flex-start', marginBottom: '20px' }}>
+            <button 
+              onClick={() => navigate('/')}
+              style={{
+                display: 'flex',
+                alignItems: 'center',
+                gap: '8px',
+                background: 'rgba(51, 51, 51, 0.8)', 
+                border: 'none',
+                padding: '8px 16px',
+                borderRadius: '20px',
+                cursor: 'pointer',
+                fontSize: '14px',
+                boxShadow: '0 2px 5px rgba(0,0,0,0.2)'
+              }}
+            >
+              <FaArrowLeft /> Volver
+            </button>
+        </div>
         <h1>Página de Escaneo</h1>
 
         <div>

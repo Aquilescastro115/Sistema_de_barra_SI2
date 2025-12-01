@@ -14,7 +14,6 @@ function ScannerPage({ addScannedItem }) {
 
   useBarcodeScanner({
     onScan: (code) => {
-      console.log("Escaneado:", code);
       setScannedCode(code);
 
       if (scanStep === 'persona') {
@@ -26,11 +25,13 @@ function ScannerPage({ addScannedItem }) {
 
       equipoCodeRef.current = code;
       setEquipoCode(code);
+
       addScannedItem({
         personaCodigo: personaCodeRef.current,
         equipoCodigo: code,
         hora: new Date().toLocaleString(),
       });
+
       resetScan();
       navigate('/');
     }
@@ -46,182 +47,167 @@ function ScannerPage({ addScannedItem }) {
   };
 
   return (
-      <div>
-        <style>{`
-          :root {
-            font-family: 'Cambria', Cochin, Georgia, Times, Times New Roman, serif;
-            line-height: 1.5;
-            font-weight: 400;
-            color-scheme: light dark;
-            font-synthesis: none;
-            text-rendering: optimizeLegibility;
-            -webkit-font-smoothing: antialiased;
-            -moz-osx-font-smoothing: grayscale;
+    <div className="scanner-page">
 
-            --primary: steelblue;
-            --primary-light: lightsteelblue;
-            --text-dark: #333;
-            --text-muted: #666;
-            --radius: 12px;
+      <style>{`
+        :root {
+          font-family: 'Cambria', Cochin, Georgia, Times, 'Times New Roman', serif;
+        }
+
+        body {
+          margin: 0;
+          padding: 0;
+        }
+
+        .scanner-page {
+          text-align: center;
+          margin-top: 30px;
+        }
+
+        .volver-btn {
+          display: flex;
+          align-items: center;
+          gap: 8px;
+          background: rgba(51, 51, 51, 0.85);
+          color: white;
+          border: none;
+          padding: 10px 20px;
+          border-radius: 20px;
+          cursor: pointer;
+          font-size: 14px;
+          box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+          margin: 0 auto 25px auto;
+          transition: 0.2s;
+        }
+
+        .volver-btn:hover {
+          background: rgba(70, 70, 70, 0.9);
+        }
+
+        h1 {
+          color: steelblue;
+          margin-bottom: 20px;
+        }
+
+        .info-text {
+          font-size: 18px;
+          font-weight: bold;
+        }
+
+        .scan-step-box {
+          margin: 20px auto;
+          padding: 10px 20px;
+          background: #f0f0f0;
+          border-radius: 8px;
+          display: inline-block;
+        }
+
+        .scan-step-box strong {
+          color: steelblue;
+        }
+
+        .label {
+          font-weight: bold;
+          color: steelblue;
+        }
+
+        .data-lines {
+          margin-top: 25px;
+          display: flex;
+          flex-direction: column;
+          gap: 18px;
+          font-size: 18px;
+        }
+
+        .reset-btn {
+          margin-top: 25px;
+          padding: 10px 20px;
+          border: none;
+          border-radius: 10px;
+          background-color: lightsteelblue;
+          color: #213547;
+          cursor: pointer;
+          transition: 0.2s;
+        }
+
+        .reset-btn:hover {
+          background-color: steelblue;
+          color: white;
+        }
+
+        .helper-text {
+          color: #777;
+          margin-top: 25px;
+          font-size: 14px;
+        }
+
+        @media (prefers-color-scheme: dark) {
+
+          body {
+            background-color: #1f1f1f;
+            color: #f5f5f5;
           }
 
-          body, html {
-            margin: 0;
-            padding: 0;
+          .volver-btn {
+            background: rgba(200, 200, 200, 0.15);
+            color: white;
           }
 
-          .scanner-container {
-            max-width: 600px;
-            margin: 60px auto;
-            padding: 40px;
-            text-align: center;
-            border-radius: 12px;
+          .volver-btn:hover {
+            background: rgba(220, 220, 220, 0.25);
           }
 
-          .scanner-container h1 {
-            margin-bottom: 30px;
-            font-size: 32px;
+          h1 {
+            color: lightsteelblue;
           }
 
-          .info-text {
-            font-weight: bold;
-            margin-bottom: 20px;
-            line-height: 1.5;
-            font-size: 20px;
-          }
-
-          .step-text {
-            margin-top: 10px;
-            margin-bottom: 25px;
-            font-size: 18px;
-          }
-
-          .scanned-box {
-            margin-bottom: 25px;
-          }
-
-          .scanned-box p {
-            margin: 10px 0;
-            font-size: 18px;
+          .scan-step-box {
+            background: #333;
+            color: white;
           }
 
           .label {
-            font-weight: bold;
+            color: lightsteelblue;
           }
 
-          .scan-reset-btn {
-            border: none;
-            padding: 12px 22px;
-            cursor: pointer;
-            font-size: 17px;
-            border-radius: 12px;
-            transition: 0.2s;
-            margin-bottom: 18px;
+          .reset-btn {
+            background-color: steelblue;
+            color: white;
           }
 
-          .detected {
-            font-size: 22px;
-            font-weight: bold;
-            margin-top: 20px;
-            margin-bottom: 5px;
+          .reset-btn:hover {
+            background-color: lightsteelblue;
+            color: #213547;
           }
 
           .helper-text {
-            font-size: 13px;
+            color: #ccc;
           }
+        }
+      `}</style>
 
-          @media (prefers-color-scheme: light) {
-            body {
-              background-color: #f4f4f4;
-            }
+      <button className="volver-btn" onClick={() => navigate('/')}>
+        <FaArrowLeft /> Volver al Menú
+      </button>
 
-            .scanner-container {
-              background-color: white;
-              color: #333;
-              box-shadow: 0 4px 10px rgba(0,0,0,0.1);
-            }
+      <h1>Escaneo de Código de Barras</h1>
 
-            h1 {
-              color: var(--primary);
-            }
+      <p className="info-text">Escanea primero el código del profesor y luego el del equipo.</p>
 
-            .label {
-              color: var(--primary);
-            }
-
-            .scan-reset-btn {
-              background-color: var(--primary-light);
-              color: #213547;
-            }
-
-            .scan-reset-btn:hover {
-              background-color: var(--primary);
-              color: white;
-            }
-          }
-
-          @media (prefers-color-scheme: dark) {
-            body {
-              background-color: #1f1f1f;
-            }
-
-            .scanner-container {
-              background-color: #2a2a2a;
-              color: #f5f5f5;
-              box-shadow: 0 4px 10px rgba(0,0,0,0.4);
-            }
-
-            h1 {
-              color: var(--primary-light);
-            }
-
-            .label {
-              color: var(--primary-light);
-            }
-
-            .scan-reset-btn {
-              background-color: var(--primary);
-              color: white;
-            }
-
-            .scan-reset-btn:hover {
-              background-color: var(--primary-light);
-              color: white;
-            }
-
-            .helper-text {
-              color: #ccc;
-            }
-          }
-        `}</style>
-
-
-
-      <div className="scanner-container">
-        <h1>Página de Escaneo</h1>
-
-        <div>
-          <p className="info-text">Escanea primero el código del profesor <br></br> y luego el equipo.</p>
-          <p className="step-text">Paso actual: <strong>{scanStep === 'persona' ? 'Persona' : 'Equipo'}</strong></p>
-        </div>
-
-        <div className="scanned-box">
-          <p><span className="label">Profesor:</span> {personaCode || 'Pendiente'}</p>
-          <p><span className="label">Equipo:</span> {equipoCode || 'Pendiente'}</p>
-        </div>
-
-        <button className="scan-reset-btn" onClick={resetScan}>
-          Reiniciar escaneo
-        </button>
-
-        <p className="detected">
-          Producto detectado: {scannedCode}
-        </p> <br></br>
-
-        <p className="helper-text">
-          (Usa la pistola USB o escribe rápido y presiona Enter)
-        </p>
+      <div className="scan-step-box">
+        Escaneando: <strong>{scanStep === 'persona' ? '👤 PROFESOR' : '💻 EQUIPO'}</strong>
       </div>
+
+      <div className="data-lines">
+        <p><span className="label">Profesor:</span> {personaCode || 'Pendiente'}</p>
+        <p><span className="label">Equipo:</span> {equipoCode || 'Pendiente'}</p>
+      </div>
+
+      <button className="reset-btn" onClick={resetScan}>
+        Reiniciar escaneo
+      </button>
+
+      <p className="helper-text">(Usa la pistola USB o escribe rápido y presiona Enter)</p>
     </div>
   );
 }

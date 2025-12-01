@@ -16,7 +16,7 @@ DB_NAME = 'sistema_db'
 
 # ================= CONFIGURACIÓN DE CORREO =================
 EMAIL_ORIGEN = "crsandovalmardones@gmail.com"  # <--- PON TU GMAIL AQUÍ
-EMAIL_PASSWORD = "Clasico1" # <--- TU CONTRASEÑA DE APLICACIÓN DE GMAIL
+EMAIL_PASSWORD = "abcd efgh ijkl mnop" # <--- TU CONTRASEÑA DE APLICACIÓN DE GMAIL
 
 # ================= CONFIGURACIÓN DE WHATSAPP (TWILIO) =================
 # Ya puse tus datos reales aquí:

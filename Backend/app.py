@@ -140,16 +140,8 @@ def add_profesor():
         if conn: conn.close()
         return jsonify({"error": f"Error interno: {str(e)}"}), 500
 
-from api import reports_bp, loans_bp  # import desde backend/api/__init__.py
-
-# registra ambos con el mismo prefijo '/api'
-def register_blueprints(app):
-    app.register_blueprint(reports_bp, url_prefix="/api")
-    app.register_blueprint(loans_bp, url_prefix="/api")
-
-# y luego en main
-register_blueprints(app)
-
+from api.reports import reports_bp
+app.register_blueprint(reports_bp, url_prefix="/api")
 
 
 

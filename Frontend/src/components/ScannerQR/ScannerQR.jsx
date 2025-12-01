@@ -72,7 +72,11 @@ function ScannerQR({ addScannedItem }) {
           --text-muted: #666;
         }
 
-        body, html { margin: 0; padding: 0; }
+        body {
+          margin: 0;
+          padding: 0;
+          background: #000000;
+        }
 
         .scanner-container {
           max-width: 600px;

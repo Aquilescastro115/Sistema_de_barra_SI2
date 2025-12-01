@@ -57,18 +57,18 @@ function HomePage({ scannedData, removeScannedItem, updateScannedItem, usuario, 
                 style={{ display: 'flex', flexDirection: 'column', gap: '15px', marginTop: '20px', alignItems: 'center', padding: '20px', width: '300px' }}>
 
                 <button onClick={handleNavigation}>
-                    Ir a escáner de barras
+                    Ir a Escáner de barras
                 </button>
 
                 <button onClick={handleNavigationQR}>
-                    Ir a escáner de QR
+                    Ir a Escáner de QR
                 </button>
 
                 <button onClick={handleNavigateReports}>
                     Ir a Reportes
                 </button>
 
-                <button onClick={handleNavigateGenerarCodigo} style={{ backgroundColor: '#C82909', padding: '5px 15px' }}>
+                <button onClick={handleNavigateGenerarCodigo}>
                     Generar QR / Código de Barras
                 </button>
 

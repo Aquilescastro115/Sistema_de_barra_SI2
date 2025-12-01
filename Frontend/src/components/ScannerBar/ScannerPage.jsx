@@ -1,4 +1,4 @@
-import React, { useRef, useState, useEffect } from 'react';
+import React, { useRef, useState } from 'react';
 import { useBarcodeScanner } from './useBarcodeScanner.js';
 import { useNavigate } from 'react-router-dom';
 
@@ -12,7 +12,6 @@ function ScannerPage({ addScannedItem }) {
 
   const [personaCode, setPersonaCode] = useState('');
   const [equipoCode, setEquipoCode] = useState('');
-  
   const [lastScanned, setLastScanned] = useState("Esperando...");
 
   const navigate = useNavigate();
@@ -55,55 +54,37 @@ function ScannerPage({ addScannedItem }) {
   };
 
   return (
-    <div>
+    <div style={{ padding: "25px", textAlign: "center" }}>
 
       <style>{`
-        :root {
-          font-family: 'Cambria', Cochin, Georgia, Times, Times New Roman, serif;
-          color-scheme: light dark;
-          --primary: steelblue;
-          --primary-light: lightsteelblue;
-          --text-muted: #666;
-        }
-
         body {
           margin: 0;
           padding: 0;
           background: #000000;
         }
 
-        .scanner-container {
-          max-width: 600px;
-          margin: 50px auto;
-          padding: 40px;
-          border-radius: 12px;
-          text-align: center;
+        :root {
+          font-family: 'Cambria', Cochin, Georgia, Times, 'Times New Roman', serif;
+          color-scheme: light dark;
+          --primary: steelblue;
+          --primary-light: lightsteelblue;
+          --text-muted: #888;
         }
 
-        h1 { font-size: 32px; margin-bottom: 25px; }
+        h1 { margin-top: 20px; margin-bottom: 25px; }
 
-        .info-text { 
-          font-size: 20px;
-          font-weight: bold;
-          margin-bottom: 15px;
-          line-height: 1.5;
-        }
+        .info-text { margin: 15px 0; font-size: 20px; font-weight: bold; }
 
-        .step-text {
-          margin: 10px 0 20px;
-          font-size: 18px;
-          color: var(--text-muted);
-        }
+        .step-text { margin: 20px 0; }
 
-        .scanned-box p {
-          margin: 8px 0;
-          font-size: 18px;
-        }
+        .scanned-box p { margin: 12px 0; font-size: 18px; }
 
-        .label { font-weight: bold; }
+        .detected { margin-top: 30px; font-size: 22px; }
+
+        .helper-text { margin-top: 25px; opacity: 0.8; }
 
         .scan-reset-btn {
-          margin-top: 20px;
+          margin-top: 25px;
           padding: 12px 22px;
           font-size: 17px;
           border: none;
@@ -112,79 +93,68 @@ function ScannerPage({ addScannedItem }) {
           transition: 0.2s;
         }
 
-        .detected {
-          margin-top: 25px;
-          font-size: 22px;
-          font-weight: bold;
-        }
-
-        .helper-text { font-size: 13px; margin-top: 5px; }
-
         @media (prefers-color-scheme: light) {
           body { background: #f4f4f4; }
-          .scanner-container {
-            background: white;
-            color: #333;
-            box-shadow: 0 4px 10px rgba(0,0,0,0.1);
-          }
           h1 { color: var(--primary); }
-          .label { color: var(--primary); }
-          .scan-reset-btn { background: var(--primary-light); color: #213547; }
+          .scan-reset-btn { background: var(--primary-light); }
           .scan-reset-btn:hover { background: var(--primary); color: white; }
         }
 
         @media (prefers-color-scheme: dark) {
           body { background: #1f1f1f; }
-          .scanner-container {
-            background: #2a2a2a;
-            color: #f5f5f5;
-            box-shadow: 0 4px 10px rgba(0,0,0,0.4);
-          }
           h1 { color: var(--primary-light); }
-          .label { color: var(--primary-light); }
           .scan-reset-btn { background: var(--primary); color: white; }
-          .scan-reset-btn:hover { background: var(--primary-light); color: white; }
+          .scan-reset-btn:hover { background: var(--primary-light); }
         }
       `}</style>
 
+      <button
+        style={{
+          backgroundColor: 'gray',
+          color: 'white',
+          padding: '10px 20px',
+          borderRadius: '9999px',
+          border: 'none',
+          cursor: 'pointer',
+          marginBottom: '25px'
+        }}
+        onClick={() => navigate('/')}
+      >
+        ← volver
+      </button>
 
-      <div className="scanner-container">
-        <h1>Escaneo por Pistola</h1>
+      <h1>Escaneo por Pistola</h1>
 
-        <p className="info-text">
-          Escanea primero al profesor<br/>y luego el equipo.
-        </p>
+      <p className="info-text">
+        Escanea primero al profesor y luego el equipo.
+      </p>
 
-        <p className="step-text">
-          Paso actual: <strong>{scanStep === 'persona' ? 'Persona' : 'Equipo'}</strong>
-        </p>
+      <p className="step-text">
+        Paso actual: <strong>{scanStep === 'persona' ? 'Persona' : 'Equipo'}</strong>
+      </p>
 
-        <div className="scanned-box">
-          <p><span className="label">Profesor:</span> {personaCode || 'Pendiente'}</p>
-          <p><span className="label">Equipo:</span> {equipoCode || 'Pendiente'}</p>
-        </div>
-
-        {scanResult ? (
-          <>
-            <h2>¡Escaneo Exitoso!</h2>
-            <p>Código: <strong>{scanResult}</strong></p>
-            <button className="scan-reset-btn" onClick={resetScan}>Nuevo Escaneo</button>
-          </>
-        ) : (
-          <>
-            <p className="detected">
-              Último detectado: {lastScanned}
-            </p>
-
-            <button className="scan-reset-btn" onClick={resetScan}>
-              Reiniciar escaneo
-            </button>
-          </>
-        )}
-
-        <p className="helper-text">(Usa la pistola USB o escribe rápido + Enter)</p>
+      <div className="scanned-box">
+        <p><strong>Profesor:</strong> {personaCode || 'Pendiente'}</p>
+        <p><strong>Equipo:</strong> {equipoCode || 'Pendiente'}</p>
       </div>
 
+      {scanResult ? (
+        <>
+          <h2 style={{ marginTop: "30px" }}>¡Escaneo Exitoso!</h2>
+          <p><strong>{scanResult}</strong></p>
+          <button className="scan-reset-btn" onClick={resetScan}>Nuevo Escaneo</button>
+        </>
+      ) : (
+        <>
+          <p className="detected">Último detectado: {lastScanned}</p>
+
+          <button className="scan-reset-btn" onClick={resetScan}>
+            Reiniciar escaneo
+          </button>
+        </>
+      )}
+
+      <p className="helper-text">(Usa la pistola USB o escribe rápido + Enter)</p>
     </div>
   );
 }

@@ -14,6 +14,7 @@ function ScannerPage({ addScannedItem }) {
 
   useBarcodeScanner({
     onScan: (code) => {
+      console.log("Escaneado:", code);
       setScannedCode(code);
 
       if (scanStep === 'persona') {
@@ -25,7 +26,6 @@ function ScannerPage({ addScannedItem }) {
 
       equipoCodeRef.current = code;
       setEquipoCode(code);
-
       addScannedItem({
         personaCodigo: personaCodeRef.current,
         equipoCodigo: code,
@@ -57,6 +57,7 @@ function ScannerPage({ addScannedItem }) {
         body {
           margin: 0;
           padding: 0;
+          background: #000000;
         }
 
         .scanner-page {
@@ -102,10 +103,6 @@ function ScannerPage({ addScannedItem }) {
           display: inline-block;
         }
 
-        .scan-step-box strong {
-          color: steelblue;
-        }
-
         .label {
           font-weight: bold;
           color: steelblue;
@@ -142,72 +139,41 @@ function ScannerPage({ addScannedItem }) {
         }
 
         @media (prefers-color-scheme: dark) {
-
           body {
             background-color: #1f1f1f;
             color: #f5f5f5;
           }
-
-          .volver-btn {
-            background: rgba(200, 200, 200, 0.15);
-            color: white;
-          }
-
-          .volver-btn:hover {
-            background: rgba(220, 220, 220, 0.25);
-          }
-
-          h1 {
-            color: lightsteelblue;
-          }
-
-          .scan-step-box {
-            background: #333;
-            color: white;
-          }
-
-          .label {
-            color: lightsteelblue;
-          }
-
-          .reset-btn {
-            background-color: steelblue;
-            color: white;
-          }
-
-          .reset-btn:hover {
-            background-color: lightsteelblue;
-            color: #213547;
-          }
-
-          .helper-text {
-            color: #ccc;
-          }
         }
       `}</style>
 
-      <button className="volver-btn" onClick={() => navigate('/')}>
-        <FaArrowLeft /> Volver al Menú
-      </button>
+      <div className="scanner-container">
+        <h1>Página de Escaneo</h1>
 
-      <h1>Escaneo de Código de Barras</h1>
+        <div>
+          <p className="info-text">
+            Escanea primero el código del profesor <br />
+            y luego el equipo.
+          </p>
+          <p className="step-text">
+            Paso actual: <strong>{scanStep === 'persona' ? 'Persona' : 'Equipo'}</strong>
+          </p>
+        </div>
 
-      <p className="info-text">Escanea primero el código del profesor y luego el del equipo.</p>
+        <div className="scanned-box">
+          <p><span className="label">Profesor:</span> {personaCode || 'Pendiente'}</p>
+          <p><span className="label">Equipo:</span> {equipoCode || 'Pendiente'}</p>
+        </div>
 
-      <div className="scan-step-box">
-        Escaneando: <strong>{scanStep === 'persona' ? '👤 PROFESOR' : '💻 EQUIPO'}</strong>
+        <button className="scan-reset-btn" onClick={resetScan}>
+          Reiniciar escaneo
+        </button>
+
+        <p className="detected">Producto detectado: {scannedCode}</p>
+
+        <p className="helper-text">
+          (Usa la pistola USB o escribe rápido y presiona Enter)
+        </p>
       </div>
-
-      <div className="data-lines">
-        <p><span className="label">Profesor:</span> {personaCode || 'Pendiente'}</p>
-        <p><span className="label">Equipo:</span> {equipoCode || 'Pendiente'}</p>
-      </div>
-
-      <button className="reset-btn" onClick={resetScan}>
-        Reiniciar escaneo
-      </button>
-
-      <p className="helper-text">(Usa la pistola USB o escribe rápido y presiona Enter)</p>
     </div>
   );
 }

@@ -103,7 +103,7 @@ const Login = ({ onLoginSuccess }) => {
     return (
         <div className="wrapper">
             <form onSubmit={handleSubmit}>
-                <h1>Login Fachero.</h1>
+                <h1>Login</h1>
                 
                 <div className={`input-box ${errorUsuario ? 'error-border' : ''}`}>
                     <input 

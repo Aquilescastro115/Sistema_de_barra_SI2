@@ -143,6 +143,7 @@ INSERT INTO Equipo (id_equipo, Codigo_qr, Tipo_equipo, Descripcion, Estado) VALU
 INSERT INTO Profesor (id_Profesor, Nombre, Email_institucional, Rut, Password, Activo) VALUES (1, 'Pepe Cortisona', 'Pepe.Cortisona@Unach.cl', 12345678-9, 'Condorito', 1);
 INSERT INTO Profesor (id_Profesor, Nombre, Email_institucional, Rut, Password, Activo) VALUES (2, 'HuevoDuro', 'Huevo.Duro@Unach.cl', 98765432-1, 'Cone', 1);
 INSERT INTO Profesor (id_Profesor, Nombre, Email_institucional, Rut, Password, Activo) VALUES (3, 'Yayita', 'Yayitaaa@Unach.cl', 2222222-5, 'HuevoDuro', 1);
+INSERT INTO Profesor (id_Profesor, Nombre, Email_institucional, Rut, Password, Activo) VALUES (5, 'Diego Castro', 'diegocastro@unach.cl', '21695092-5', '12345', 1);
 
 INSERT INTO Prestamo (fk_id_Profesor, fecha_solicitud, estado, fecha_devolucion) VALUES (1, '2023-11-30', 'Activo', '2023-12-05');
 INSERT INTO Detalle_prestamo (fk_id_equipo, fk_id_Prestamo, fecha_entrega, fecha_devolucion, estado) VALUES (2, 1, '2023-11-30', '2023-12-05', 'Entregado');

@@ -71,7 +71,7 @@ return (
         }
 
         .scanner-container {
-          max-width: 500px;
+          max-width: 600px;
           margin: 40px auto;
           padding: 30px;
           text-align: center;
@@ -83,7 +83,7 @@ return (
         }
 
         h1 { 
-          font-size: 28px; 
+          font-size: 32px; 
           margin-bottom: 20px; 
           color: var(--primary); 
           font-weight: bold;
@@ -124,7 +124,6 @@ return (
           color: var(--text-muted);
         }
 
-        /* Caja gris para los datos escaneados */
         .scanned-box {
             background: #f4f4f4;
             padding: 15px;
@@ -159,7 +158,6 @@ return (
             color: #777; 
         }
 
-        /* Ajuste para el cuadro de la cámara */
         #reader {
             border-radius: 10px;
             overflow: hidden;
@@ -175,7 +173,6 @@ return (
         }
       `}</style>
 
-      {/* CONTENEDOR TIPO TARJETA --- lo volvi a colocar pq se ve mal sin esto */}
       <div className="scanner-container">
         
         <button className="volver-btn" onClick={() => navigate('/')}>
@@ -185,7 +182,7 @@ return (
         <h1>Escaneo de QR</h1>
 
         <p className="info-text">
-          Escanea primero a la persona<br/>y luego el equipo.
+          Escanea primero a la persona y luego el equipo.
         </p>
 
         <p className="step-text">

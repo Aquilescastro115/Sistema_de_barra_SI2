@@ -179,7 +179,7 @@ return (
         <h1>Escaneo de Barras</h1>
 
         <p className="info-text">
-          Escanea primero al profesor y luego el equipo.
+          Escanea primero a  la persona y luego el equipo.
         </p>
 
         <p className="step-text">

@@ -77,16 +77,14 @@ const Login = ({ onLoginSuccess }) => {
         setIsLoading(true);
 
         try {
-            const respuesta = await loginAPI(usuario, password);
-            
-            if (recordarme) {
-                localStorage.setItem('usuarioGuardado', usuario);
-            } else {
-                localStorage.removeItem('usuarioGuardado');
-            }
+        if (respuesta.id_Profesor) {
+            localStorage.setItem('userId', String(respuesta.id_Profesor));
+        }
+        if (respuesta.Rut) {
+            localStorage.setItem('userRut', String(respuesta.Rut));
+        }
 
-
-            onLoginSuccess(respuesta.nombre); 
+        onLoginSuccess(respuesta.nombre);
 
         } catch (errorObjeto) {
             const mensaje = errorObjeto.message || "Error desconocido";

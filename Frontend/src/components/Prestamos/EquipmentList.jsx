@@ -3,6 +3,8 @@ import React, { useEffect, useState } from 'react';
 import API from '../../api';
 import LoanModal from './LoanModal';
 import ExportPdfButton from '../Reportes/ExportPdfButton';
+import axios from '../../api';
+
 
 export default function EquipmentList({ currentUserId, onLoanSuccess }) {
   const [items, setItems] = useState([]);
@@ -41,6 +43,30 @@ export default function EquipmentList({ currentUserId, onLoanSuccess }) {
     { header: 'Descripción', key: 'Descripcion' },
     { header: 'Estado', key: 'Estado' },
   ];
+  const handleRequestLoan = async ({ solicitanteId, beneficiarioId, equipoId }) => {
+    try {
+      const body = {
+        fk_id_Profesor_solicitante: solicitanteId,
+        fk_id_Profesor_beneficiario: beneficiarioId,
+        fk_id_equipo: equipoId,
+        // fecha_devolucion: '2025-12-05' // opcional
+      };
+      // Asegúrate que la baseURL de axios apunta a tu backend; si usas proxy en package.json, '/api/...' está bien.
+      const res = await axios.post('/api/loans/request', body);
+      if (res.data && res.data.ok) {
+        alert('Préstamo creado OK: ID préstamo ' + res.data.id_Prestamo);
+        if (onLoanSuccess) onLoanSuccess();
+      } else {
+        // mostrar el mensaje de error que venga del backend
+        const msg = (res.data && res.data.message) ? res.data.message : 'Respuesta inesperada';
+        alert('Error en la solicitud: ' + msg);
+      }
+    } catch (err) {
+      console.error('Error en request loan:', err);
+      // Mostrar mensaje con lo que venga del servidor si existe
+      const serverMsg = err?.response?.data?.message || err?.response?.data || err.message;
+      alert('Error en la solicitud: ' + serverMsg);
+    }}
 
   return (
     <div>
@@ -83,13 +109,16 @@ export default function EquipmentList({ currentUserId, onLoanSuccess }) {
       )}
 
       {modalOpen && selectedEquipo && (
-        <LoanModal
-          equipo={selectedEquipo}
-          onClose={handleModalClose}
-          onSuccess={handleLoanSuccess}
-          currentUserId={currentUserId}
-        />
+<LoanModal
+  equipo={selectedEquipo}
+  onClose={handleModalClose}
+  onSuccess={handleLoanSuccess}
+  currentUserId={currentUserId}
+  currentUserRut={currentUserRut}   
+/>
       )}
     </div>
+
+    
   );
 }

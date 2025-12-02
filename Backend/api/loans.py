@@ -1,6 +1,5 @@
 # backend/api/loans.py
 from flask import Blueprint, request, jsonify, current_app
-from app import get_db_connection  # ajusta import según tu estructura
 import pymysql
 
 loans_bp = Blueprint('loans', __name__)
@@ -9,16 +8,30 @@ loans_bp = Blueprint('loans', __name__)
 def request_loan():
     """
     POST /api/loans/request
-    body: { fk_id_Profesor_solicitante, fk_id_Profesor_beneficiario, fk_id_equipo, fecha_devolucion (YYYY-MM-DD) }
+    body JSON esperado:
+    {
+      "fk_id_Profesor_solicitante": 1,
+      "fk_id_Profesor_beneficiario": 4,
+      "fk_id_equipo": 1,
+      "fecha_devolucion": "2025-12-05"   # opcional
+    }
     """
+    # Importar la función de conexión aquí para evitar circular imports
+    from app import get_db_connection
+
     data = request.get_json() or {}
-    solicitante = data.get('fk_id_Profesor_solicitante')
+    solicitante = data.get('fk_id_Profesor_solicitante')  # puede ser None
     beneficiario = data.get('fk_id_Profesor_beneficiario')
     equipo_id = data.get('fk_id_equipo')
     fecha_devolucion = data.get('fecha_devolucion')  # opcional
+    solicitante_rut = data.get('solicitante_Rut')  # opcional
 
-    if not solicitante or not beneficiario or not equipo_id:
-        return jsonify({"ok": False, "message": "Faltan campos: solicitante, beneficiario o equipo"}), 400
+    if not solicitante and solicitante_rut:
+        with get_db_connection().cursor() as c:
+            c.execute("SELECT id_Profesor FROM Profesor WHERE Rut = %s AND Activo = 1", (solicitante_rut,))
+            row = c.fetchone()
+            if row:
+                solicitante = row.get('id_Profesor')
 
     conn = get_db_connection()
     if conn is None:
@@ -31,17 +44,16 @@ def request_loan():
             row = cursor.fetchone()
             if not row:
                 return jsonify({"ok": False, "message": "Equipo no encontrado"}), 404
-            if row['Estado'].lower() != 'disponible':
-                return jsonify({"ok": False, "message": "Equipo no disponible"}), 400
+            if str(row.get('Estado', '')).lower() not in ('disponible', 'libre', '0', '') and str(row.get('Estado','')).lower() != 'disponible':
+                return jsonify({"ok": False, "message": "Equipo no disponible", "estado_actual": row.get('Estado')}), 400
 
             # 2) Validar beneficiario existe y activo
             cursor.execute("SELECT Activo FROM Profesor WHERE id_Profesor = %s", (beneficiario,))
             prof = cursor.fetchone()
-            if not prof or prof['Activo'] != 1:
+            if not prof or int(prof.get('Activo', 0)) != 1:
                 return jsonify({"ok": False, "message": "Beneficiario no válido o no activo"}), 400
 
-            # 3) Crear prestamo y detalle (en la misma transacción)
-            # Si fecha_devolucion no viene, el backend puede calcular por ejemplo +7 días
+            # Si fecha_devolucion no viene, añadir 7 días por defecto
             if not fecha_devolucion:
                 cursor.execute("SELECT DATE_ADD(CURDATE(), INTERVAL 7 DAY) AS fd")
                 fecha_devolucion = cursor.fetchone()['fd']
@@ -71,8 +83,14 @@ def request_loan():
         return jsonify({"ok": True, "id_Prestamo": id_prestamo, "id_Detalle": id_detalle, "message": "Préstamo creado"}), 201
 
     except Exception as e:
-        conn.rollback()
+        try:
+            conn.rollback()
+        except Exception:
+            pass
         current_app.logger.exception("Error creando préstamo")
         return jsonify({"ok": False, "message": str(e)}), 500
     finally:
-        conn.close()
+        try:
+            conn.close()
+        except Exception:
+            pass

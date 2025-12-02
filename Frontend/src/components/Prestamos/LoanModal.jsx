@@ -1,46 +1,73 @@
-// src/components/LoanModal.jsx
 import React, { useState, useEffect } from 'react';
-import API from '../../api'; // ajusta si tu path es distinto
+import API from '../../api'; // Ajusta si tu path es distinto
 
 export default function LoanModal({ equipo, onClose, onSuccess, currentUserId }) {
+  const [profesores, setProfesores] = useState([]);
   const [beneficiarioId, setBeneficiarioId] = useState(currentUserId || '');
   const [fechaDevolucion, setFechaDevolucion] = useState('');
-  const [profesores, setProfesores] = useState([]);
   const [loading, setLoading] = useState(false);
+  const [error, setError] = useState(null);
 
+  // Cargar profesores al abrir modal
   useEffect(() => {
     let mounted = true;
+
     API.get('/profesores')
       .then(res => {
-        if (!mounted) return;
-        setProfesores(res.data || []);
+        if (mounted) setProfesores(res.data || []);
       })
-      .catch(console.error);
-    return () => mounted = false;
+      .catch(e => {
+        console.error('Error cargando profesores', e);
+        if (mounted) setProfesores([]);
+      });
+
+    return () => { mounted = false };
   }, []);
 
+  // Handler final (uno solo)
   const handleSubmit = async () => {
-    if (!beneficiarioId) return alert('Selecciona un beneficiario');
-    if (!confirm(`Confirmar préstamo del equipo ${equipo.Tipo_equipo} (ID ${equipo.id_equipo}) a ID ${beneficiarioId}?`)) return;
+    setError(null);
 
-    setLoading(true);
+    // Validaciones
+    if (!beneficiarioId) {
+      return setError('Seleccione un beneficiario.');
+    }
+    if (!currentUserId) {
+      return setError('No se detectó el usuario solicitante.');
+    }
+    if (!equipo || !equipo.id_equipo) {
+      return setError('Equipo inválido.');
+    }
+
+    if (!confirm(`Confirmar préstamo del equipo ${equipo.Tipo_equipo} (ID ${equipo.id_equipo}) al profesor ${beneficiarioId}?`)) {
+      return;
+    }
+
+const payload = {
+  fk_id_Profesor_solicitante: Number(currentUserId),
+  fk_id_Profesor_beneficiario: Number(beneficiarioId),
+  fk_id_equipo: Number(equipo.id_equipo),
+  fecha_devolucion: fechaDevolucion || null,
+  solicitante_Rut: currentUserRut || null   // <-- agregamos el rut (opcional)
+};
+
+// Envío
+const res = await API.post('/loans/request', payload);
+
+
     try {
-      const payload = {
-        fk_id_Profesor_solicitante: currentUserId,
-        fk_id_Profesor_beneficiario: Number(beneficiarioId),
-        fk_id_equipo: Number(equipo.id_equipo),
-        fecha_devolucion: fechaDevolucion || null
-      };
+      setLoading(true);
       const res = await API.post('/loans/request', payload);
+
       if (res.data?.ok) {
         alert('Préstamo creado: ' + res.data.id_Prestamo);
         if (onSuccess) onSuccess(res.data);
       } else {
-        alert('Error: ' + (res.data?.message || 'Error desconocido'));
+        setError(res.data?.message || 'Error desconocido del backend');
       }
     } catch (err) {
       console.error(err);
-      alert(err.response?.data?.message || 'Error en la solicitud');
+      setError(err.response?.data?.message || 'Error en la solicitud');
     } finally {
       setLoading(false);
       onClose();
@@ -50,7 +77,14 @@ export default function LoanModal({ equipo, onClose, onSuccess, currentUserId })
   return (
     <div style={{ position:'fixed', inset:0, background:'rgba(0,0,0,0.4)', display:'flex', alignItems:'center', justifyContent:'center' }}>
       <div style={{ width:480, background:'#fff', borderRadius:8, padding:16 }}>
+        
         <h3>Solicitar préstamo — Equipo {equipo.Tipo_equipo} (ID {equipo.id_equipo})</h3>
+
+        {error && (
+          <div style={{ background:'#ffdddd', padding:8, borderRadius:4, color:'#900', marginBottom:10 }}>
+            {error}
+          </div>
+        )}
 
         <label>Beneficiario (Profesor)</label>
         <select value={beneficiarioId} onChange={e=>setBeneficiarioId(e.target.value)}>

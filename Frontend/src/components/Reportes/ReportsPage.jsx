@@ -13,6 +13,11 @@ export default function ReportsPage(){
   const [professors, setProfessors] = useState([]);
   const [loading, setLoading] = useState(true);
   const [selectedProf, setSelectedProf] = useState(null);
+  const storedUserRut = localStorage.getItem('userRut') || null;
+  const currentUserRut = storedUserRut || null;
+  const storedUserId = localStorage.getItem('userId'); // debe ser string
+  const currentUserId = storedUserId ? Number(storedUserId) : null;
+
 
   const navigate = useNavigate();
 
@@ -113,7 +118,11 @@ export default function ReportsPage(){
       <hr style={{ margin: '24px 0' }} />
 
       {/* Aquí incluimos el inventario y pasamos refreshProfessors como callback */}
-      <EquipmentList onLoanSuccess={() => refreshProfessors()} />
+<EquipmentList
+  currentUserId={currentUserId}
+  currentUserRut={currentUserRut}
+  onLoanSuccess={() => refreshProfessors()}
+/>
     </div>
   );
 }

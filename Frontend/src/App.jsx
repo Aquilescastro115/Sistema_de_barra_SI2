@@ -141,40 +141,45 @@ function App() {
     };
 
     const addScannedItem = async (item) => {
-        // 1. Mostrar visualmente (Estado: Guardando...)
-        setScannedData((prevData) => [
-            ...prevData, 
-            { 
-                personaCodigo: item.personaCodigo,
-                equipoCodigo: item.equipoCodigo,
-                hora: item.hora,
-                estado: 'Guardando...' 
-            }
-        ]);
+    // 1. LIMPIEZA AUTOMÁTICA (El truco mágico) 🧹
+    // Reemplazamos cualquier comilla (') por guion (-)
+    const rutLimpio = item.personaCodigo.replace(/'/g, '-');
+    const equipoLimpio = item.equipoCodigo.replace(/'/g, '-');
 
-        // 2. ENVIAR AL BACKEND (Esto es lo que activa el Monitor)
-        try {
-            const response = await fetch('http://localhost:5000/api/prestamos', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({
-                    rut: item.personaCodigo,       
-                    codigo_equipo: item.equipoCodigo 
-                })
-            });
-
-            const data = await response.json();
-
-            if (response.ok) {
-                alert("✅ Guardado en Base de Datos");
-            } else {
-                alert("❌ Error: " + data.error);
-            }
-        } catch (error) {
-            console.error(error);
-            alert("❌ Error de conexión");
+    // 2. Mostrar visualmente (Estado: Guardando...)
+    setScannedData((prevData) => [
+        ...prevData, 
+        { 
+            personaCodigo: rutLimpio, // Usamos el dato limpio
+            equipoCodigo: equipoLimpio, // Usamos el dato limpio
+            hora: item.hora,
+            estado: 'Guardando...' 
         }
-    };
+    ]);
+
+    // 3. ENVIAR AL BACKEND
+    try {
+        const response = await fetch('http://localhost:5000/api/prestamos', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                rut: rutLimpio,          // <-- Enviamos el RUT corregido
+                codigo_equipo: equipoLimpio // <-- Enviamos el código corregido
+            })
+        });
+
+        const data = await response.json();
+
+        if (response.ok) {
+            alert("✅ Guardado en Base de Datos");
+        } else {
+            alert("❌ Error: " + (data.error || "Desconocido"));
+        }
+    } catch (error) {
+        console.error(error);
+        alert("❌ Error de conexión");
+    }
+  };
 
     const removeScannedItem = (index) => {
         setScannedData((prevData) => prevData.filter((_, i) => i !== index)); 

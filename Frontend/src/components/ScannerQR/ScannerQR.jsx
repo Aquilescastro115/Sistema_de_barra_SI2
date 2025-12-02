@@ -64,7 +64,6 @@ function ScannerQR({ addScannedItem }) {
 return (
     <div>
       <style>{`
-        /* ESTILOS INTERNOS PARA ASEGURAR QUE SE VEA BIEN */
         :root {
           font-family: 'Cambria', Cochin, Georgia, Times, Times New Roman, serif;
           --primary: steelblue;
@@ -76,8 +75,6 @@ return (
           margin: 40px auto;
           padding: 30px;
           text-align: center;
-          
-          /* LA CLAVE: Fondo blanco semi-transparente y bordes */
           background-color: rgba(255, 255, 255, 0.95);
           backdrop-filter: blur(5px);
           border-radius: 15px;

@@ -1,6 +1,7 @@
 import React, { useRef, useState } from 'react';
 import { useBarcodeScanner } from './useBarcodeScanner.js';
 import { useNavigate } from 'react-router-dom';
+import { FaArrowLeft } from "react-icons/fa";
 
 function ScannerPage({ addScannedItem }) {
 
@@ -53,108 +54,164 @@ function ScannerPage({ addScannedItem }) {
     setScanStep("persona");
   };
 
-  return (
-    <div style={{ padding: "25px", textAlign: "center" }}>
-
+return (
+    <div>
       <style>{`
-        body {
-          margin: 0;
-          padding: 0;
-          background: #000000;
-        }
-
         :root {
-          font-family: 'Cambria', Cochin, Georgia, Times, 'Times New Roman', serif;
-          color-scheme: light dark;
+          font-family: 'Cambria', Cochin, Georgia, Times, Times New Roman, serif;
           --primary: steelblue;
-          --primary-light: lightsteelblue;
-          --text-muted: #888;
+          --text-muted: #666;
+        }
+        .scanner-container {
+          max-width: 600px;
+          margin: 40px auto;
+          padding: 30px;
+          text-align: center;
+          background-color: rgba(255, 255, 255, 0.95);
+          backdrop-filter: blur(5px);
+          border-radius: 15px;
+          box-shadow: 0 8px 32px rgba(0,0,0,0.2);
+          border: 1px solid rgba(255, 255, 255, 0.2);
         }
 
-        h1 { margin-top: 20px; margin-bottom: 25px; }
+        h1 { 
+          font-size: 32px; 
+          margin-bottom: 25px; 
+          color: var(--primary); 
+          font-weight: bold;
+        }
 
-        .info-text { margin: 15px 0; font-size: 20px; font-weight: bold; }
+        .volver-btn {
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          gap: 8px;
+          background: #333;
+          color: white;
+          border: none;
+          padding: 8px 16px;
+          border-radius: 20px;
+          cursor: pointer;
+          font-size: 14px;
+          margin: 0 auto 20px auto;
+          transition: transform 0.2s;
+        }
+        
+        .volver-btn:hover {
+            background: #555;
+            transform: scale(1.05);
+        }
 
-        .step-text { margin: 20px 0; }
+        .info-text { 
+          font-size: 18px;
+          font-weight: 600;
+          margin-bottom: 15px;
+          line-height: 1.4;
+          color: #333;
+        }
 
-        .scanned-box p { margin: 12px 0; font-size: 18px; }
+        .step-text {
+          margin: 10px 0 20px;
+          font-size: 16px;
+          color: var(--text-muted);
+        }
+        .scanned-box {
+            background: #f4f4f4;
+            padding: 15px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            border: 1px solid #ddd;
+            text-align: left;
+        }
 
-        .detected { margin-top: 30px; font-size: 22px; }
+        .scanned-box p {
+          margin: 8px 0;
+          font-size: 16px;
+          color: #333;
+          border-bottom: 1px dashed #ccc;
+          padding-bottom: 5px;
+        }
 
-        .helper-text { margin-top: 25px; opacity: 0.8; }
+        .label { 
+            font-weight: bold; 
+            color: var(--primary); 
+            display: inline-block;
+            width: 80px;
+        }
+
+        .detected {
+          margin-top: 15px;
+          font-size: 18px;
+          font-weight: bold;
+          color: #28a745;
+        }
 
         .scan-reset-btn {
-          margin-top: 25px;
-          padding: 12px 22px;
-          font-size: 17px;
+          margin-top: 20px;
+          padding: 10px 20px;
           border: none;
-          border-radius: 12px;
+          border-radius: 10px;
+          background-color: lightsteelblue;
+          color: #213547;
           cursor: pointer;
           transition: 0.2s;
+          font-weight: bold;
         }
 
-        @media (prefers-color-scheme: light) {
-          body { background: #f4f4f4; }
-          h1 { color: var(--primary); }
-          .scan-reset-btn { background: var(--primary-light); }
-          .scan-reset-btn:hover { background: var(--primary); color: white; }
+        .scan-reset-btn:hover {
+          background-color: steelblue;
+          color: white;
         }
 
-        @media (prefers-color-scheme: dark) {
-          body { background: #1f1f1f; }
-          h1 { color: var(--primary-light); }
-          .scan-reset-btn { background: var(--primary); color: white; }
-          .scan-reset-btn:hover { background: var(--primary-light); }
+        .helper-text { 
+            font-size: 13px; 
+            margin-top: 20px; 
+            color: #777; 
         }
       `}</style>
 
-      <button
-        style={{
-          backgroundColor: 'gray',
-          color: 'white',
-          padding: '10px 20px',
-          borderRadius: '9999px',
-          border: 'none',
-          cursor: 'pointer',
-          marginBottom: '25px'
-        }}
-        onClick={() => navigate('/')}
-      >
-        ← volver
-      </button>
+      <div className="scanner-container">
+        
+        <button className="volver-btn" onClick={() => navigate('/')}>
+            <FaArrowLeft /> Volver al Menú
+        </button>
 
-      <h1>Escaneo por Pistola</h1>
+        <h1>Escaneo de Barras</h1>
 
-      <p className="info-text">
-        Escanea primero al profesor y luego el equipo.
-      </p>
+        <p className="info-text">
+          Escanea primero al profesor y luego el equipo.
+        </p>
 
-      <p className="step-text">
-        Paso actual: <strong>{scanStep === 'persona' ? 'Persona' : 'Equipo'}</strong>
-      </p>
+        <p className="step-text">
+          Paso actual: <strong>{scanStep === 'persona' ? '👤 Persona' : '💻 Equipo'}</strong>
+        </p>
 
-      <div className="scanned-box">
-        <p><strong>Profesor:</strong> {personaCode || 'Pendiente'}</p>
-        <p><strong>Equipo:</strong> {equipoCode || 'Pendiente'}</p>
+        <div className="scanned-box">
+          <p><span className="label">Persona:</span> {personaCode || 'Pendiente'}</p>
+          <p><span className="label">Equipo:</span> {equipoCode || 'Pendiente'}</p>
+        </div>
+
+        {scanResult ? (
+          <>
+            <h2>¡Escaneo Exitoso!</h2>
+            <p className="detected">{scanResult}</p>
+            <button className="scan-reset-btn" onClick={resetScan}>Nuevo Escaneo</button>
+          </>
+        ) : (
+          <>
+            <p className="detected">
+              Último detectado: {lastScanned !== "Esperando..." ? lastScanned : "..."}
+            </p>
+
+            <button className="scan-reset-btn" onClick={resetScan}>
+              Reiniciar escaneo
+            </button>
+          </>
+        )}
+
+        <p className="helper-text">(Usa la pistola USB o escribe rápido + Enter)</p>
       </div>
 
-      {scanResult ? (
-        <>
-          <h2 style={{ marginTop: "30px" }}>¡Escaneo Exitoso!</h2>
-          <p><strong>{scanResult}</strong></p>
-          <button className="scan-reset-btn" onClick={resetScan}>Nuevo Escaneo</button>
-        </>
-      ) : (
-        <>
-          <p className="detected">Último detectado: {lastScanned}</p>
-
-          <button className="scan-reset-btn" onClick={resetScan}>
-            Reiniciar escaneo
-          </button>
-        </>
-      )}
-
-      <p className="helper-text">(Usa la pistola USB o escribe rápido + Enter)</p>
     </div>
   );
 }

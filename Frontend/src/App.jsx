@@ -131,16 +131,40 @@ function App() {
         localStorage.removeItem('usuarioGuardado');
     };
 
-    const addScannedItem = (item) => {
+    const addScannedItem = async (item) => {
+        // 1. Mostrar visualmente (Estado: Guardando...)
         setScannedData((prevData) => [
             ...prevData, 
             { 
                 personaCodigo: item.personaCodigo,
                 equipoCodigo: item.equipoCodigo,
                 hora: item.hora,
-                estado: 'Dentro de plazo' 
+                estado: 'Guardando...' 
             }
         ]);
+
+        // 2. ENVIAR AL BACKEND (Esto es lo que activa el Monitor)
+        try {
+            const response = await fetch('http://localhost:5000/api/prestamos', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    rut: item.personaCodigo,       
+                    codigo_equipo: item.equipoCodigo 
+                })
+            });
+
+            const data = await response.json();
+
+            if (response.ok) {
+                alert("✅ Guardado en Base de Datos");
+            } else {
+                alert("❌ Error: " + data.error);
+            }
+        } catch (error) {
+            console.error(error);
+            alert("❌ Error de conexión");
+        }
     };
 
     const removeScannedItem = (index) => {

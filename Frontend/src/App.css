@@ -17,3 +17,41 @@ p {
   color: #888;
 }
 
+.menu-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center; 
+    gap: 12px; 
+    width: 100%;
+    padding: 12px 20px;
+    font-size: 16px;
+    font-weight: 600;
+    color: #333;
+    background-color: white;
+    border: 1px solid #ddd;
+    border-radius: 10px;
+    cursor: pointer;
+    transition: all 0.2s ease-in-out;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+}
+
+.menu-btn:hover {
+    background-color: steelblue;
+    color: white;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(0,0,0,0.15);
+    border-color: steelblue;
+}
+
+
+.logout-btn {
+    background-color: #ffeaea;
+    color: #C82909;
+    border-color: #ffcccc;
+}
+
+.logout-btn:hover {
+    background-color: #C82909;
+    color: white;
+    border-color: #C82909;
+}

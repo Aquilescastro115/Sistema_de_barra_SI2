@@ -6,6 +6,7 @@ import ScannerQR from './components/ScannerQR/ScannerQR.jsx';
 import ReportsPage from './components/Reportes/ReportsPage.jsx';
 import Login from './components/Login/Login.jsx';
 import GenerarCodigo from './components/Generador/GenerarCodigo.jsx';
+import { FaBarcode, FaQrcode, FaFileAlt, FaPlus, FaSignOutAlt } from "react-icons/fa";
 
 
 function HomePage({ scannedData, removeScannedItem, updateScannedItem, usuario, onLogout }) {
@@ -20,7 +21,19 @@ function HomePage({ scannedData, removeScannedItem, updateScannedItem, usuario, 
         <div className="container">
 
             <div className='user-header' 
-                style={{display: 'flex', justifyContent: 'space-between', alignItems:'center', marginBottom: '20px', color:'white'}}
+                style={{
+                    display: 'flex', 
+                    justifyContent: 'space-between', 
+                    alignItems:'center', 
+                    marginBottom: '20px', 
+                    backgroundColor: 'rgba(0, 0, 0, 0.6)',
+                    padding: '15px 25px',
+                    borderRadius: '15px',
+                    backdropFilter: 'blur(5px)',
+                    border: '1px solid rgba(255, 255, 255, 0.2)',
+                    maxWidth: '800px',
+                    color:'white'
+                }}
             >
                 <h2>Hola, {usuario}</h2>
             </div>
@@ -54,27 +67,45 @@ function HomePage({ scannedData, removeScannedItem, updateScannedItem, usuario, 
             </div>
 
             <div className="button-container card" 
-                style={{ display: 'flex', flexDirection: 'column', gap: '15px', marginTop: '20px', alignItems: 'center', padding: '20px', width: '300px' }}>
+                style={{ 
+                    display: 'flex', 
+                    flexDirection: 'column', 
+                    gap: '15px', 
+                    marginTop: '20px', 
+                    alignItems: 'center', 
+                    padding: '30px', 
+                    width: '100%',
+                    maxWidth: '350px',
+                    backgroundColor: 'rgba(255, 255, 255, 0.9)', 
+                    backdropFilter: 'blur(10px)',
+                    borderRadius: '15px',
+                    boxShadow: '0 8px 32px rgba(0, 0, 0, 0.2)',
+                    border: '1px solid rgba(255, 255, 255, 0.2)'
+                }}
+            >
 
-                <button onClick={handleNavigation}>
-                    Ir a Escáner de barras
+                <button onClick={handleNavigation} className="menu-btn">
+                    <FaBarcode size={20} /> Escáner de Barras
                 </button>
 
-                <button onClick={handleNavigationQR}>
-                    Ir a Escáner de QR
+                <button onClick={handleNavigationQR} className="menu-btn">
+                    <FaQrcode size={20} /> Escáner de QR
                 </button>
 
-                <button onClick={handleNavigateReports}>
-                    Ir a Reportes
+                <button onClick={handleNavigateReports} className="menu-btn">
+                    <FaFileAlt size={20} /> Ver Reportes
+                </button>
+            
+                <button onClick={handleNavigateGenerarCodigo} className="menu-btn">
+                    <FaPlus size={20} /> Generar Códigos
                 </button>
 
-                <button onClick={handleNavigateGenerarCodigo}>
-                    Generar QR / Código de Barras
-                </button>
 
-                <button onClick={onLogout} 
-                    style={{ backgroundColor: '#C82909', color: 'white', padding: '5px 15px' }}>
-                    Salir
+                <hr style={{ width: '100%', border: '0', borderTop: '1px solid #ccc', margin: '10px 0' }}/>
+
+
+                <button onClick={onLogout} className="menu-btn logout-btn">
+                    <FaSignOutAlt size={20} /> Cerrar Sesión
                 </button>
             </div>
 

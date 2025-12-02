@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import './Login.css';
-import { validarInput, isRequired, minLength, noSpaces } from './validators';
+import { validarInput, isRequired, minLength, noSpaces, isSafeInput, maxLength } from './validators';
 // import { FaUserTie, FaLock } from "react-icons/fa";
 
 const loginAPI = async (usuario, password) => {
@@ -48,13 +48,13 @@ const Login = ({ onLoginSuccess }) => {
 
  
     const validarUsuario = () => {
-        const error = validarInput(usuario, [isRequired, noSpaces, minLength(3)]);
+        const error = validarInput(usuario, [isRequired, noSpaces, minLength(3), maxLength(60)]);
         setErrorUsuario(error);
         return error;
     };
 
     const validarPassword = () => {
-        const error = validarInput(password, [isRequired]);
+        const error = validarInput(password, [isRequired, isSafeInput]);
         setErrorPassword(error);
         return error;
     };

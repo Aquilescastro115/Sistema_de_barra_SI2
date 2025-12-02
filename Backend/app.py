@@ -133,10 +133,13 @@ def login():
     
     return jsonify({
         "mensaje": "Login exitoso",
+        "id_Profesor": usuario_en_bd["id_Profesor"],   # <- id
+        "Rut": usuario_en_bd.get("Rut"),              # <- rut
         "nombre": usuario_en_bd["Nombre"],
         "rol": "profesor",
         "email": usuario_en_bd["Email_institucional"]
     }), 200
+
 
 def buscar_usuario_por_rut(rut):
     conn = get_db_connection()
@@ -245,7 +248,10 @@ def add_profesor():
         return jsonify({"error": f"Error interno: {str(e)}"}), 500
 
 from api.reports import reports_bp
+from api.loans import loans_bp  
+
 app.register_blueprint(reports_bp, url_prefix="/api")
+app.register_blueprint(loans_bp, url_prefix="/api")   
 
 # --- RUTA RECUPERADA: CREAR PRÉSTAMO RÁPIDO ---
 @app.route('/api/prestamos', methods=['POST'])

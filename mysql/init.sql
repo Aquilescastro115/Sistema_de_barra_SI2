@@ -141,11 +141,18 @@ INSERT INTO Equipo (id_equipo, Codigo_qr, Tipo_equipo, Descripcion, Estado) VALU
 INSERT INTO Equipo (id_equipo, Codigo_qr, Tipo_equipo, Descripcion, Estado) VALUES (44, 2019, 'Computador', 'equipo nuevo 19', 'Disponible');
 INSERT INTO Equipo (id_equipo, Codigo_qr, Tipo_equipo, Descripcion, Estado) VALUES (45, 2020, 'Computador', 'equipo nuevo 20', 'Disponible');
 
-INSERT INTO Profesor (id_Profesor, Nombre, Email_institucional, Rut, Password, Activo) VALUES (1, 'Pepe Cortisona', 'Pepe.Cortisona@Unach.cl', '12345678-9', 'Condorito', 1);
-INSERT INTO Profesor (id_Profesor, Nombre, Email_institucional, Rut, Password, Activo) VALUES (2, 'HuevoDuro', 'Huevo.Duro@Unach.cl', '98765432-1', 'Cone', 1);
-INSERT INTO Profesor (id_Profesor, Nombre, Email_institucional, Rut, Password, Activo) VALUES (3, 'Yayita', 'Yayitaaa@Unach.cl', '2222222-5', 'HuevoDuro', 1);
-INSERT INTO Profesor (id_Profesor, Nombre, Email_institucional, Rut, Password, Activo) VALUES (4, 'Diego Castro', 'diegocastro@unach.cl', '21695092-5', '12345', 1);
+-- Inserts con numeros de telefono falsos para probar (o pon los reales tuyos)
+INSERT INTO Profesor (id_Profesor, Nombre, Email_institucional, Rut, numero_telefono, Password, Activo) 
+VALUES (1, 'Pepe Cortisona', 'Pepe.Cortisona@Unach.cl', '12345678-9', '+56911111111', 'Condorito', 1);
 
+INSERT INTO Profesor (id_Profesor, Nombre, Email_institucional, Rut, numero_telefono, Password, Activo) 
+VALUES (2, 'HuevoDuro', 'cristobalsandova@alu.unach.cl', '98765432-1', '+56999655922', 'Cone', 1);
+
+INSERT INTO Profesor (id_Profesor, Nombre, Email_institucional, Rut, numero_telefono, Password, Activo) 
+VALUES (3, 'Yayita', 'Yayitaaa@Unach.cl', '2222222-5', '+56933333333', 'HuevoDuro', 1);
+
+INSERT INTO Profesor (id_Profesor, Nombre, Email_institucional, Rut, numero_telefono, Password, Activo) 
+VALUES (4, 'Diego Castro', 'diegocastro@unach.cl', '21695092-5', '+56944444444', '12345', 1);
 
 INSERT INTO Prestamo (fk_id_Profesor, fecha_solicitud, estado, fecha_devolucion) VALUES (1, '2023-11-30', 'Activo', '2023-12-05');
 INSERT INTO Detalle_prestamo (fk_id_equipo, fk_id_Prestamo, fecha_entrega, fecha_devolucion, estado) VALUES (2, 1, '2023-11-30', '2023-12-05', 'Entregado');

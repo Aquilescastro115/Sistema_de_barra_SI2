@@ -40,6 +40,7 @@
 import os
 from flask import Flask, jsonify, request
 from flask_cors import CORS
+from datetime import datetime, timedelta
 import pymysql
 import pymysql.cursors
 
@@ -66,7 +67,7 @@ def get_db_connection():
         print(f"Error conectando a MySQL: {e}")
         return None
 
-# --- RUTA 1: RAIZ (Para ver si vive) ---
+# --- RUTA 1: RAIZ ---
 @app.route('/', methods=['GET'])
 def home():
     return jsonify({
@@ -74,7 +75,7 @@ def home():
         "rutas_disponibles": ["/api/equipos", "/"]
     })
 
-# --- RUTA 2: EQUIPOS (La que buscas) ---
+# --- RUTA 2: EQUIPOS ---
 @app.route('/api/equipos', methods=['GET'])
 def get_equipos():
     conn = get_db_connection()
@@ -106,6 +107,61 @@ def get_profesores():
     except Exception as e:
         if conn: conn.close()
         return jsonify({"error": str(e)}), 500
+
+
+@app.route('/api/equipos', methods=['POST'])
+def add_equipo():
+    data = request.get_json()
+
+    # Validar campos del frontend (sin id_equipo)
+    required_fields = ['Codigo_qr', 'Tipo_equipo', 'Estado']
+
+    for field in required_fields:
+        if field not in data:
+            return jsonify({"error": f"Falta el campo obligatorio: {field}"}), 400
+
+    conn = get_db_connection()
+    if conn is None:
+        return jsonify({"error": "Falló conexión DB"}), 500
+
+    try:
+        with conn.cursor() as cursor:
+
+            # 1. Obtener el último ID existente
+            cursor.execute("SELECT COALESCE(MAX(id_equipo), 0) AS max_id FROM Equipo")
+            ultimo_id = cursor.fetchone()['max_id']
+            nuevo_id = ultimo_id + 1
+
+            # 2. Insertar con el nuevo ID
+            sql = """
+                INSERT INTO Equipo (id_equipo, Codigo_qr, Tipo_equipo, Descripcion, Estado)
+                VALUES (%s, %s, %s, %s, %s)
+            """
+            cursor.execute(sql, (
+                nuevo_id,
+                data['Codigo_qr'],
+                data['Tipo_equipo'],
+                data.get('Descripcion', None),
+                data['Estado']
+            ))
+
+            conn.commit()
+
+        conn.close()
+        return jsonify({
+            "mensaje": "Equipo creado exitosamente",
+            "id_generado": nuevo_id
+        }), 201
+
+    except pymysql.err.IntegrityError as e:
+        if conn: conn.close()
+        return jsonify({"error": "Codigo_qr ya existe."}), 409
+    except Exception as e:
+        if conn: conn.close()
+        return jsonify({"error": str(e)}), 500
+
+
+
 
 @app.route('/api/profesores', methods=['POST'])
 def add_profesor():
@@ -140,18 +196,57 @@ def add_profesor():
         if conn: conn.close()
         return jsonify({"error": f"Error interno: {str(e)}"}), 500
 
-from api import reports_bp, loans_bp  # import desde backend/api/__init__.py
+from api.reports import reports_bp
+app.register_blueprint(reports_bp, url_prefix="/api")
 
-# registra ambos con el mismo prefijo '/api'
-def register_blueprints(app):
-    app.register_blueprint(reports_bp, url_prefix="/api")
-    app.register_blueprint(loans_bp, url_prefix="/api")
+# --- RUTA RECUPERADA: CREAR PRÉSTAMO RÁPIDO ---
+@app.route('/api/prestamos', methods=['POST'])
+def crear_prestamo_rapido():
+    data = request.get_json()
+    # Esperamos recibir: { "rut": "12345678-9", "codigo_equipo": "2002" }
+    rut_profe = data.get('rut')
+    codigo_equipo = data.get('codigo_equipo')
+    
+    conn = get_db_connection()
+    if not conn: return jsonify({"error": "Sin conexión a DB"}), 500
 
-# y luego en main
-register_blueprints(app)
+    try:
+        with conn.cursor() as cursor:
+            # 1. Buscar Profesor
+            cursor.execute("SELECT id_Profesor FROM Profesor WHERE Rut = %s", (rut_profe,))
+            profe = cursor.fetchone()
+            if not profe: return jsonify({"error": "Profesor no encontrado"}), 404
 
+            # 2. Buscar Equipo
+            cursor.execute("SELECT id_equipo, Estado FROM Equipo WHERE Codigo_qr = %s", (codigo_equipo,))
+            equipo = cursor.fetchone()
+            if not equipo: return jsonify({"error": "Equipo no encontrado"}), 404
+            
+            if equipo['Estado'] == 'Prestado':
+                return jsonify({"error": "Este equipo ya está prestado"}), 400
 
+            # 3. Guardar Préstamo (Fecha dev: mañana)
+            fecha_dev = (datetime.now() + timedelta(days=1)).strftime('%Y-%m-%d')
+            
+            # Insertar Encabezado
+            sql_p = "INSERT INTO Prestamo (fk_id_Profesor, fecha_solicitud, estado, fecha_devolucion) VALUES (%s, NOW(), 'Activo', %s)"
+            cursor.execute(sql_p, (profe['id_Profesor'], fecha_dev))
+            id_prestamo = cursor.lastrowid
 
+            # Insertar Detalle
+            sql_d = "INSERT INTO Detalle_prestamo (fk_id_equipo, fk_id_Prestamo, fecha_entrega, fecha_devolucion, estado) VALUES (%s, %s, NOW(), %s, 'Prestado')"
+            cursor.execute(sql_d, (equipo['id_equipo'], id_prestamo, fecha_dev))
+
+            # Actualizar Equipo
+            cursor.execute("UPDATE Equipo SET Estado = 'Prestado' WHERE id_equipo = %s", (equipo['id_equipo'],))
+            
+            conn.commit()
+        
+        conn.close()
+        return jsonify({"mensaje": "Préstamo Guardado OK"}), 201
+
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
 
 if __name__ == '__main__':
     # Esto imprime las rutas al iniciar

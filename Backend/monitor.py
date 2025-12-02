@@ -7,7 +7,6 @@ from email.mime.multipart import MIMEMultipart
 from twilio.rest import Client
 
 # ================= CONFIGURACIÓN DE BASE DE DATOS =================
-# Usamos el puerto 3307 porque es el que Docker expone hacia Windows
 DB_HOST = 'localhost'
 DB_PORT = 3307
 DB_USER = 'user_app'
@@ -15,13 +14,14 @@ DB_PASS = 'app_user_password_999'
 DB_NAME = 'sistema_db'
 
 # ================= CONFIGURACIÓN DE CORREO =================
-EMAIL_ORIGEN = "crsandovalmardones@gmail.com"  # <--- PON TU GMAIL AQUÍ
-EMAIL_PASSWORD = "abcd efgh ijkl mnop" # <--- TU CONTRASEÑA DE APLICACIÓN DE GMAIL
+EMAIL_ORIGEN = "crsandovalmardones@gmail.com"
+# ¡IMPORTANTE! Aquí pega tu clave de 16 letras de Google (borra las xxxx)
+EMAIL_PASSWORD = "hfti zobu mots qwij" 
 
 # ================= CONFIGURACIÓN DE WHATSAPP (TWILIO) =================
-# Ya puse tus datos reales aquí:
 TWILIO_SID = "AC456b1e58479c9d0cf865cbd1528b1736"
-TWILIO_TOKEN = "dfd18efc57097839388628b2bca13c5c"
+# Token actualizado:
+TWILIO_TOKEN = "1f595b4eb2f787b5fd3936a0fa71892e" 
 TWILIO_NUMBER = "whatsapp:+14155238886"
 
 # ================= MEMORIA DEL ESPÍA =================
@@ -41,7 +41,7 @@ def conectar_db():
 
 def enviar_notificacion(email, telefono, asunto, mensaje):
     # 1. ENVIAR CORREO
-    if email and EMAIL_ORIGEN != "crsandovalmardones@gmail.com":
+    if email:
         try:
             msg = MIMEMultipart()
             msg['From'] = EMAIL_ORIGEN
@@ -56,14 +56,11 @@ def enviar_notificacion(email, telefono, asunto, mensaje):
             server.quit()
             print(f"📧 Correo enviado a {email}")
         except Exception as e:
-            print(f"❌ Error enviando correo: {e}")
-    else:
-        print("⚠️ Correo no configurado, saltando envío de email.")
+            print(f"❌ Error enviando correo (Revisa tu clave de 16 letras): {e}")
 
     # 2. ENVIAR WHATSAPP
     if telefono:
         try:
-            # Twilio necesita el formato whatsapp:+569...
             if not telefono.startswith("whatsapp:"):
                 telefono = f"whatsapp:{telefono}"
             
@@ -79,7 +76,6 @@ def revisar_atrasos_nocturnos():
     try:
         conn = conectar_db()
         with conn.cursor() as cursor:
-            # Buscar equipos prestados cuya fecha de devolución ya pasó
             sql = """
                 SELECT p.Nombre, p.Email_institucional, p.numero_telefono, e.Descripcion, dp.fecha_devolucion
                 FROM Detalle_prestamo dp
@@ -107,7 +103,6 @@ def inicializar():
     try:
         conn = conectar_db()
         with conn.cursor() as cursor:
-            # Memorizar estado actual para no repetir avisos antiguos
             cursor.execute("SELECT MAX(id_Prestamo) as max_id FROM Prestamo")
             row = cursor.fetchone()
             if row and row['max_id']:
@@ -121,9 +116,7 @@ def inicializar():
         print(f"👀 Espía listo. Vigilo desde préstamo ID: {ultimo_prestamo_id}")
     except Exception as e:
         print(f"❌ Error crítico de conexión: {e}")
-        print("💡 PISTA: Asegúrate de que Docker esté corriendo.")
 
-    # Programar la revisión nocturna
     schedule.every().day.at("00:00").do(revisar_atrasos_nocturnos)
 
 # ================= BUCLE PRINCIPAL (VIGILANCIA) =================
@@ -131,13 +124,13 @@ def vigilar():
     global ultimo_prestamo_id
     
     while True:
-        schedule.run_pending() # Revisa el reloj por si son las 00:00
+        schedule.run_pending() 
 
         try:
             conn = conectar_db()
             with conn.cursor() as cursor:
                 
-                # --- A) DETECTAR NUEVOS PRÉSTAMOS ---
+                # A) NUEVOS PRÉSTAMOS
                 sql_nuevos = """
                     SELECT pr.id_Prestamo, p.Nombre, p.Email_institucional, p.numero_telefono, e.Descripcion
                     FROM Prestamo pr
@@ -150,20 +143,19 @@ def vigilar():
                 nuevos = cursor.fetchall()
 
                 for row in nuevos:
-                    print(f"🚨 Nuevo préstamo detectado: {row['Nombre']} retiró {row['Descripcion']}")
+                    print(f"🚨 Nuevo préstamo: {row['Nombre']} retiró {row['Descripcion']}")
                     msg = f"Hola {row['Nombre']}, has registrado el préstamo de: {row['Descripcion']}."
                     enviar_notificacion(row['Email_institucional'], row['numero_telefono'], "Comprobante de Préstamo", msg)
                     
                     if row['id_Prestamo'] > ultimo_prestamo_id:
                         ultimo_prestamo_id = row['id_Prestamo']
                     
-                    # Añadir a vigilancia de devoluciones
                     cursor.execute("SELECT id_Detalle_prestamo FROM Detalle_prestamo WHERE fk_id_Prestamo = %s", (row['id_Prestamo'],))
                     detalles = cursor.fetchall()
                     for d in detalles:
                         prestamos_activos_memoria.add(d['id_Detalle_prestamo'])
 
-                # --- B) DETECTAR DEVOLUCIONES ---
+                # B) DEVOLUCIONES
                 if prestamos_activos_memoria:
                     ids_str = ','.join(str(id) for id in prestamos_activos_memoria)
                     sql_check = f"""
@@ -179,18 +171,16 @@ def vigilar():
 
                     for row in revisados:
                         if row['estado'] == 'Devuelto':
-                            print(f"✅ Devolución detectada: {row['Nombre']} entregó {row['Descripcion']}")
+                            print(f"✅ Devolución: {row['Nombre']} entregó {row['Descripcion']}")
                             msg = f"Hola {row['Nombre']}, gracias por devolver el equipo: {row['Descripcion']}."
                             enviar_notificacion(row['Email_institucional'], row['numero_telefono'], "Equipo Devuelto", msg)
-                            
                             prestamos_activos_memoria.remove(row['id_Detalle_prestamo'])
 
             conn.close()
-        except Exception as e:
-            # Si se cae la conexión momentáneamente, solo esperamos
+        except Exception:
             pass
         
-        time.sleep(5) # Descansar 5 segundos
+        time.sleep(5)
 
 if __name__ == "__main__":
     inicializar()
